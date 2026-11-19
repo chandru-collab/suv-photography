@@ -32,9 +32,5 @@ COPY . .
 
 EXPOSE 8000
 
-# Health check built into container
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/healthz || exit 1
-
-# Launch with multi-process Uvicorn
+# Launch with production Uvicorn cluster
 CMD ["python", "run_production.py"]

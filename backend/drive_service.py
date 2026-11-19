@@ -52,17 +52,32 @@ FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
 
 def find_credentials_file() -> Optional[Path]:
     """Locate the Google Cloud Service Account JSON credentials file."""
-    # 0. Check raw JSON string in environment variable (Render / Cloud deployment)
+    # 0. Check raw JSON string or base64 in environment variable (Render / Cloud deployment)
     raw_json = (os.environ.get("GOOGLE_CREDENTIALS_JSON") or "").strip()
     if raw_json:
-        creds_target = DATA_DIR / "google_credentials.json"
-        try:
-            data = json.loads(raw_json)
-            if data.get("type") == "service_account":
-                creds_target.write_text(raw_json, encoding="utf-8")
-                return creds_target
-        except Exception as e:
-            logger.warning(f"Invalid GOOGLE_CREDENTIALS_JSON environment variable: {e}")
+        # Strip surrounding quotes if pasted with outer quotes
+        if (raw_json.startswith("'") and raw_json.endswith("'")) or (raw_json.startswith('"') and raw_json.endswith('"')):
+            raw_json = raw_json[1:-1].strip()
+
+        # Check if base64 encoded
+        if not raw_json.startswith("{"):
+            try:
+                import base64
+                decoded = base64.b64decode(raw_json).decode("utf-8")
+                if decoded.strip().startswith("{"):
+                    raw_json = decoded.strip()
+            except Exception:
+                pass
+
+        for target in [Path("/tmp/google_credentials.json"), DATA_DIR / "google_credentials.json"]:
+            try:
+                data = json.loads(raw_json)
+                if data.get("type") == "service_account":
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_text(raw_json, encoding="utf-8")
+                    return target
+            except Exception as e:
+                logger.warning(f"Error saving GOOGLE_CREDENTIALS_JSON to {target}: {e}")
 
     # 1. Environment variable path
     env_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
