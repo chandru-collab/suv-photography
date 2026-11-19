@@ -826,6 +826,46 @@ class SyncDriveRequest(BaseModel):
     folder_url: str
     force: bool = True
 
+@app.get("/api/drive/check-access", dependencies=[Depends(require_auth)])
+async def check_drive_access(folder_url: str):
+    """Diagnostic endpoint to verify folder access and permissions."""
+    folder_id = extract_drive_folder_id(folder_url)
+    if not folder_id:
+        return {"success": False, "error": "Invalid Google Drive folder link or folder ID."}
+
+    if not drive_manager.is_configured:
+        return {
+            "success": False,
+            "error": "Google Drive credentials not configured on server.",
+            "hint": "Set GOOGLE_CREDENTIALS_JSON in Render Environment Variables."
+        }
+
+    try:
+        meta = drive_manager.get_folder_metadata(folder_id)
+        q = f"'{folder_id}' in parents and trashed = false"
+        res = drive_manager.service.files().list(
+            q=q,
+            pageSize=20,
+            fields="files(id, name, mimeType)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
+        ).execute()
+        files = res.get("files", [])
+        return {
+            "success": True,
+            "folder_id": folder_id,
+            "folder_name": meta.get("name"),
+            "file_count": len(files),
+            "sample_files": [f["name"] for f in files[:5]],
+            "service_account": "suv-photography@suv-photography-514705.iam.gserviceaccount.com"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "hint": "Please share this folder with: suv-photography@suv-photography-514705.iam.gserviceaccount.com"
+        }
+
 @app.post("/api/sync/drive", dependencies=[Depends(require_auth)])
 async def trigger_drive_sync(payload: SyncDriveRequest):
     """Trigger fast Google Drive synchronization in background (non-blocking, parallel)."""
