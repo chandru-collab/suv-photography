@@ -164,6 +164,101 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Copy Service Account Email
+    const copyServiceEmailBtn = document.getElementById("copyServiceEmailBtn");
+    if (copyServiceEmailBtn) {
+        copyServiceEmailBtn.addEventListener("click", () => {
+            const email = "suv-photography@suv-photography-514705.iam.gserviceaccount.com";
+            navigator.clipboard.writeText(email).then(() => {
+                copyServiceEmailBtn.textContent = "✅ Copied!";
+                setTimeout(() => { copyServiceEmailBtn.textContent = "📋 Copy"; }, 2000);
+            }).catch(() => {
+                copyServiceEmailBtn.textContent = "✅ suv-photography@...";
+            });
+        });
+    }
+
+    // Quick-Fill Verified Folder: "Hi"
+    const useVerifiedFolderBtn = document.getElementById("useVerifiedFolderBtn");
+    if (useVerifiedFolderBtn) {
+        useVerifiedFolderBtn.addEventListener("click", () => {
+            driveUrl.value = "https://drive.google.com/drive/folders/1mGQfWoHfXlVim9pEDTF92UwXblWvANGJ";
+            driveUrl.focus();
+            const resArea = document.getElementById("testAccessResult");
+            if (resArea) {
+                resArea.style.display = "block";
+                resArea.style.background = "#e6f9ed";
+                resArea.style.border = "1px solid #a3e6b7";
+                resArea.style.color = "#155724";
+                resArea.innerHTML = "✅ Selected verified event folder: <strong>'Hi'</strong> (14 files). Click <strong>Sync Photos from Google Drive</strong> below.";
+            }
+        });
+    }
+
+    // Test & Verify Folder Access Diagnostic
+    const testDriveAccessBtn = document.getElementById("testDriveAccessBtn");
+    const testAccessResult = document.getElementById("testAccessResult");
+    if (testDriveAccessBtn) {
+        testDriveAccessBtn.addEventListener("click", async () => {
+            const rawUrl = driveUrl.value.trim();
+            if (!rawUrl) {
+                testAccessResult.style.display = "block";
+                testAccessResult.style.background = "#fff3cd";
+                testAccessResult.style.border = "1px solid #ffeeba";
+                testAccessResult.style.color = "#856404";
+                testAccessResult.innerHTML = "⚠️ Please enter a Google Drive link or click 'Use Verified Folder: \"Hi\"'.";
+                return;
+            }
+
+            testDriveAccessBtn.disabled = true;
+            testDriveAccessBtn.textContent = "⏳ Testing Access...";
+            testAccessResult.style.display = "block";
+            testAccessResult.style.background = "#f0f4f8";
+            testAccessResult.style.border = "1px solid #d0d7de";
+            testAccessResult.style.color = "#24292f";
+            testAccessResult.innerHTML = "Connecting to Google Drive API...";
+
+            try {
+                const res = await fetch(`/api/drive/check-access?folder_url=${encodeURIComponent(rawUrl)}`, {
+                    credentials: "include"
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    testAccessResult.style.background = "#e6f9ed";
+                    testAccessResult.style.border = "1px solid #a3e6b7";
+                    testAccessResult.style.color = "#155724";
+                    const samples = (data.sample_files || []).slice(0, 4).join(", ");
+                    testAccessResult.innerHTML = `
+                        <strong>✅ Access Verified!</strong><br>
+                        📁 Folder Name: <strong>${data.folder_name}</strong><br>
+                        📸 Files Found: <strong>${data.file_count}</strong> (${samples}...)<br>
+                        🔑 Service Account: <code>${data.service_account}</code><br>
+                        Ready to sync! Click <strong>Sync Photos from Google Drive</strong> below.
+                    `;
+                } else {
+                    testAccessResult.style.background = "#f8d7da";
+                    testAccessResult.style.border = "1px solid #f5c6cb";
+                    testAccessResult.style.color = "#721c24";
+                    testAccessResult.innerHTML = `
+                        <strong>❌ Folder Not Accessible by Service Account</strong><br>
+                        ${data.hint || "Make sure the folder is shared with:"}<br>
+                        <code style="user-select: all; font-weight: bold; background: #fff; padding: 2px 6px; border-radius: 4px;">suv-photography@suv-photography-514705.iam.gserviceaccount.com</code><br>
+                        <em>Tip: In Google Drive, right-click the folder &rarr; Share &rarr; paste the email above with "Viewer" access.</em>
+                    `;
+                }
+            } catch (err) {
+                testAccessResult.style.background = "#f8d7da";
+                testAccessResult.style.border = "1px solid #f5c6cb";
+                testAccessResult.style.color = "#721c24";
+                testAccessResult.innerHTML = `⚠️ Network test error: ${err.message}`;
+            } finally {
+                testDriveAccessBtn.disabled = false;
+                testDriveAccessBtn.textContent = "🔍 Test & Verify Folder Access";
+            }
+        });
+    }
+
     // Drive Sync Trigger
     driveSyncForm.addEventListener("submit", async (e) => {
         e.preventDefault();

@@ -84,6 +84,30 @@ def find_credentials_file() -> Optional[Path]:
     if env_path and Path(env_path).exists():
         return Path(env_path)
 
+    # 1.5. Cached credentials in tmp or data directory
+    for cached_p in [Path("/tmp/google_credentials.json"), DATA_DIR / "google_credentials.json"]:
+        if cached_p.exists():
+            try:
+                data = json.loads(cached_p.read_text(encoding="utf-8"))
+                if data.get("type") == "service_account" and "private_key" in data:
+                    return cached_p
+            except Exception:
+                pass
+
+    # 1.6 Check SQLite settings database
+    try:
+        from backend.database import get_setting
+        db_json = (get_setting("google_credentials_json", "") or "").strip()
+        if db_json:
+            data = json.loads(db_json)
+            if data.get("type") == "service_account" and "private_key" in data:
+                tgt = DATA_DIR / "google_credentials.json"
+                tgt.parent.mkdir(parents=True, exist_ok=True)
+                tgt.write_text(db_json, encoding="utf-8")
+                return tgt
+    except Exception:
+        pass
+
     # 2. Render secret file locations
     for secret_path in [Path("/etc/secrets/google-credentials.json"), Path("/etc/secrets/suv-photography-514705-7a2bae36b793.json")]:
         if secret_path.exists():

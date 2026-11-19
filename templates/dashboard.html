@@ -159,7 +159,7 @@
                         <h2>2. Google Drive Primary Storage</h2>
                         <span class="card-sublabel">Real-time cloud database &amp; media repository</span>
                     </div>
-                    <span class="badge badge-success">🟢 Google Cloud Connected</span>
+                    <span class="badge badge-success" id="driveStatusBadge">🟢 Service Account Active</span>
                 </div>
                 <div class="card-body">
                     <p class="section-desc">
@@ -179,16 +179,33 @@
                                 <span class="field-icon">🔗</span>
                                 <input type="text" id="driveUrl" name="driveUrl" placeholder="https://drive.google.com/drive/folders/1ABC..." value="{{ settings.drive_folder_url }}">
                             </div>
-                            <small class="form-hint">Paste any Google Drive link or subfolder to instantly switch events.</small>
-                            <div style="background: rgba(232, 201, 155, 0.15); border: 1px solid rgba(212, 175, 120, 0.35); padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; color: #5a1226; margin-top: 8px; line-height: 1.4;">
-                                🔑 <strong>Drive Access:</strong> Make sure your folder is shared with:<br>
-                                <code style="user-select: all; background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 4px; font-weight: 600; color: #222; display: inline-block; margin-top: 3px;">suv-photography@suv-photography-514705.iam.gserviceaccount.com</code>
+                            <small class="form-hint">Paste any Google Drive folder link to instantly switch events.</small>
+
+                            <!-- Quick Action Buttons -->
+                            <div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                <button type="button" id="useVerifiedFolderBtn" class="btn btn-sm btn-secondary" style="font-size: 0.78rem; padding: 5px 12px; border-radius: 6px; cursor: pointer;">
+                                    📁 Use Verified Folder: "Hi" (14 files)
+                                </button>
+                                <button type="button" id="testDriveAccessBtn" class="btn btn-sm" style="font-size: 0.78rem; padding: 5px 12px; border: 1px solid #7d1a2c; color: #7d1a2c; background: transparent; cursor: pointer; border-radius: 6px; font-weight: 600;">
+                                    🔍 Test &amp; Verify Folder Access
+                                </button>
+                            </div>
+
+                            <!-- Test Access Result Area -->
+                            <div id="testAccessResult" style="display: none; margin-top: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.82rem; line-height: 1.5;"></div>
+
+                            <div style="background: rgba(232, 201, 155, 0.15); border: 1px solid rgba(212, 175, 120, 0.35); padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; color: #5a1226; margin-top: 10px; line-height: 1.5;">
+                                🔑 <strong>Drive Access:</strong> Share your Google Drive folder with this Service Account:<br>
+                                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px;">
+                                    <code id="serviceAccountEmail" style="user-select: all; background: rgba(255,255,255,0.9); padding: 4px 8px; border-radius: 4px; font-weight: 600; color: #222; flex: 1; word-break: break-all; border: 1px solid #ddd;">suv-photography@suv-photography-514705.iam.gserviceaccount.com</code>
+                                    <button type="button" id="copyServiceEmailBtn" class="btn btn-sm btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; white-space: nowrap; cursor: pointer;">📋 Copy</button>
+                                </div>
                             </div>
                         </div>
 
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary btn-block" id="startSyncBtn">
-                                🔄 Fast Face Indexing
+                                🔄 Sync Photos from Google Drive
                             </button>
                         </div>
                     </form>

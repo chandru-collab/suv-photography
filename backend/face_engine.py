@@ -83,12 +83,15 @@ class FaceEngine:
             logger.error(f"Failed to initialize face engine: {e}")
             raise e
 
-    def load_image_from_bytes(self, image_bytes: bytes) -> Optional[np.ndarray]:
-        """Load image bytes into BGR OpenCV format, respecting EXIF orientation."""
+    def load_image_from_bytes(self, image_bytes: bytes, max_dimension: Optional[int] = 1600) -> Optional[np.ndarray]:
+        """Load image bytes into BGR OpenCV format, respecting EXIF orientation and downsampling to max_dimension for memory safety."""
         try:
             pil_img = Image.open(io.BytesIO(image_bytes))
             # Automatically rotate based on EXIF tag from mobile cameras
             pil_img = ImageOps.exif_transpose(pil_img)
+            # Memory safety: downsample large camera photos (e.g. 24-45MP DSLR) to max_dimension
+            if max_dimension and (pil_img.width > max_dimension or pil_img.height > max_dimension):
+                pil_img.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
             # Convert to RGB if needed
             if pil_img.mode != "RGB":
                 pil_img = pil_img.convert("RGB")

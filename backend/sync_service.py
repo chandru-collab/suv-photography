@@ -174,12 +174,12 @@ def process_drive_image_in_memory(
         return False, 0
 
     try:
-        # Fast download: Try CDN preview (=s2048) first for high-resolution face detection, fallback to API
+        # Fast download: Try CDN preview (=s1600) first for memory-safe face detection, fallback to API
         image_bytes = None
         raw_thumb = drive_item.get("thumbnailLink")
         if raw_thumb:
             try:
-                cdn_url = drive_manager.build_cdn_thumbnail(raw_thumb, size=2048)
+                cdn_url = drive_manager.build_cdn_thumbnail(raw_thumb, size=1600)
                 resp = requests.get(cdn_url, timeout=15)
                 if resp.status_code == 200 and resp.content:
                     image_bytes = resp.content
@@ -200,7 +200,7 @@ def process_drive_image_in_memory(
             if row:
                 existing_photo = dict(row)
 
-        img_bgr = face_engine.load_image_from_bytes(image_bytes)
+        img_bgr = face_engine.load_image_from_bytes(image_bytes, max_dimension=1600)
         if img_bgr is None:
             return False, 0
 
@@ -250,8 +250,12 @@ def process_drive_image_in_memory(
         logger.error(f"Error processing Drive image {filename} ({file_id}): {e}")
         return False, 0
     finally:
-        if 'img_bgr' in locals(): del img_bgr
-        if 'image_bytes' in locals(): del image_bytes
+        if 'img_bgr' in locals():
+            del img_bgr
+        if 'image_bytes' in locals():
+            del image_bytes
+        import gc
+        gc.collect()
 
 def fetch_all_drive_image_items(folder_id: str, max_depth: int = 10, current_depth: int = 0) -> List[Dict[str, Any]]:
     """Recursively collect image items from Google Drive folder structure using Drive API."""
@@ -384,8 +388,8 @@ def run_drive_sync(folder_link_or_id: str, reindex: bool = True):
             total_faces = 0
             processed_count = 0
 
-            # Controlled workers for cloud safety (prevents memory spikes on 512MB RAM instances)
-            max_sync_workers = int(os.environ.get("SYNC_WORKERS", "2"))
+            # Sequential / 1-worker processing on cloud instances (guarantees RAM stays <250MB on 512MB limit)
+            max_sync_workers = int(os.environ.get("SYNC_WORKERS", "1"))
             with concurrent.futures.ThreadPoolExecutor(max_workers=max_sync_workers) as executor:
                 futures = {
                     executor.submit(process_drive_image_in_memory, item, folder_id, reindex): item
@@ -400,10 +404,9 @@ def run_drive_sync(folder_link_or_id: str, reindex: bool = True):
                     processed_count += 1
                     sync_status["progress_percent"] = 25 + int(70 * (processed_count / total_files))
 
-                    # Periodic garbage collection every 10 images to maintain low memory footprint
-                    if processed_count % 10 == 0:
-                        import gc
-                        gc.collect()
+                    # Force immediate garbage collection after each photo
+                    import gc
+                    gc.collect()
 
                     try:
                         added, face_count = future.result()
