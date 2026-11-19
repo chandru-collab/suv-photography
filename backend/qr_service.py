@@ -15,12 +15,16 @@ def get_guest_url() -> str:
     configured = get_setting("guest_base_url", "").strip()
     if configured:
         return configured.rstrip("/")
-    # Production / Cloud deployment (Vercel frontend or public custom domain)
-    public_url = (os.environ.get("PUBLIC_URL") or os.environ.get("VERCEL_URL") or os.environ.get("FRONTEND_URL") or "").strip()
+    # Production / Cloud deployment (Render, Vercel frontend, or public custom domain)
+    public_url = (os.environ.get("RENDER_EXTERNAL_URL") or os.environ.get("PUBLIC_URL") or os.environ.get("VERCEL_URL") or os.environ.get("FRONTEND_URL") or "").strip()
     if public_url:
         if not public_url.startswith("http://") and not public_url.startswith("https://"):
             public_url = f"https://{public_url}"
         return public_url.rstrip("/")
+
+    # Detect if running in cloud container (Render / Linux Docker)
+    if os.environ.get("RENDER") or os.path.exists("/.dockerenv") or os.environ.get("PORT"):
+        return "https://suv-photography.onrender.com"
     local_ip = get_local_ip()
     return f"http://{local_ip}:{SERVER_PORT}"
 
