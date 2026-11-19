@@ -8,9 +8,13 @@ ROOT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from backend.config import SERVER_HOST, SERVER_PORT, HOST_PASSWORD, YUNET_MODEL_PATH, SFACE_MODEL_PATH
+from backend.database import init_db
 from backend.qr_service import get_guest_url
 
 def main():
+    # Ensure database schema is initialized on startup before any queries
+    init_db()
+
     # Production CPU Worker Auto-Tuning: respect WEB_CONCURRENCY, auto-scale based on cores
     default_workers = max(1, min(4, (os.cpu_count() or 1)))
     workers = int(os.environ.get("WEB_CONCURRENCY", default_workers))

@@ -15,8 +15,10 @@ from backend.config import (
     SFACE_MODEL_PATH
 )
 from backend.qr_service import generate_qr_code, get_guest_url
+from backend.database import init_db
 
 def main():
+    init_db()
     local_ip = get_local_ip()
     guest_url = get_guest_url()
     qr_path = generate_qr_code()

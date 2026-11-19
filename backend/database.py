@@ -108,25 +108,60 @@ def get_setting(key: str, default: str = "") -> str:
     cached = metadata_cache.get(f"setting:{key}")
     if cached is not None:
         return cached
-    conn = get_connection()
-    row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
-    conn.close()
-    val = row["value"] if row else default
-    metadata_cache.set(f"setting:{key}", val)
-    return val
+    try:
+        conn = get_connection()
+        row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+        conn.close()
+        val = row["value"] if row else default
+        metadata_cache.set(f"setting:{key}", val)
+        return val
+    except sqlite3.OperationalError:
+        # Auto-initialize database schema if tables do not exist yet
+        try:
+            init_db()
+            conn = get_connection()
+            row = conn.execute("SELECT value FROM settings WHERE key = ?", (key,)).fetchone()
+            conn.close()
+            val = row["value"] if row else default
+            metadata_cache.set(f"setting:{key}", val)
+            return val
+        except Exception:
+            return default
+    except Exception:
+        return default
 
 def set_setting(key: str, value: str):
-    conn = get_connection()
-    conn.execute("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value))
-    conn.commit()
-    conn.close()
-    metadata_cache.invalidate()
+    try:
+        conn = get_connection()
+        conn.execute("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value))
+        conn.commit()
+        conn.close()
+        metadata_cache.invalidate()
+    except sqlite3.OperationalError:
+        init_db()
+        conn = get_connection()
+        conn.execute("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value))
+        conn.commit()
+        conn.close()
+        metadata_cache.invalidate()
 
 def get_all_settings() -> Dict[str, str]:
-    conn = get_connection()
-    rows = conn.execute("SELECT key, value FROM settings").fetchall()
-    conn.close()
-    return {row["key"]: row["value"] for row in rows}
+    try:
+        conn = get_connection()
+        rows = conn.execute("SELECT key, value FROM settings").fetchall()
+        conn.close()
+        return {row["key"]: row["value"] for row in rows}
+    except sqlite3.OperationalError:
+        try:
+            init_db()
+            conn = get_connection()
+            rows = conn.execute("SELECT key, value FROM settings").fetchall()
+            conn.close()
+            return {row["key"]: row["value"] for row in rows}
+        except Exception:
+            return {}
+    except Exception:
+        return {}
 
 def photo_exists_by_hash(file_hash: str) -> bool:
     conn = get_connection()
