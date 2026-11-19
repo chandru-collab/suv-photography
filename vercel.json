@@ -5,19 +5,19 @@
   "rewrites": [
     {
       "source": "/api/:match*",
-      "destination": "https://suv-photography-backend.onrender.com/api/:match*"
+      "destination": "https://suv-photography.onrender.com/api/:match*"
     },
     {
       "source": "/healthz",
-      "destination": "https://suv-photography-backend.onrender.com/healthz"
+      "destination": "https://suv-photography.onrender.com/healthz"
     },
     {
       "source": "/readyz",
-      "destination": "https://suv-photography-backend.onrender.com/readyz"
+      "destination": "https://suv-photography.onrender.com/readyz"
     },
     {
       "source": "/metrics",
-      "destination": "https://suv-photography-backend.onrender.com/metrics"
+      "destination": "https://suv-photography.onrender.com/metrics"
     },
     {
       "source": "/",
