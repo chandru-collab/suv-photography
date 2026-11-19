@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Event Photo Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run.py",
+            "console": "integratedTerminal",
+            "python": "${workspaceFolder}/.venv/Scripts/python.exe"
+        },
+        {
+            "name": "Launch Chrome Dashboard",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:8000/dashboard",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}

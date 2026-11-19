@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SUV Photography Arakkonam - Event Gallery</title>
+    <link rel="stylesheet" href="/static/css/gallery.css?v=20261117_french_wine">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #722234 !important;
+            --primary-hover: #541120 !important;
+            --primary-light: #fbf4f5 !important;
+            --secondary: #8c2b42 !important;
+            --french-wine: #4a1521 !important;
+            --french-wine-deep: #380c16 !important;
+            --french-wine-muted: #7a4d56 !important;
+            --cream-bg: #f8f5f0 !important;
+            --text-primary: #4a1521 !important;
+            --text-muted: #7a4d56 !important;
+            --border: #e8e0d5 !important;
+        }
+        body, html {
+            background-color: #f8f5f0 !important;
+            color: #4a1521 !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
+        h1, h2, h3, h4, h5, h6,
+        .brand-title,
+        .current-folder-title,
+        .section-heading,
+        .folder-card-title,
+        .media-name,
+        strong {
+            color: #4a1521 !important;
+        }
+        .brand-subtitle,
+        .current-folder-desc,
+        .folder-card-subtitle,
+        .media-size,
+        .breadcrumb-sep {
+            color: #7a4d56 !important;
+        }
+        .nav-btn-primary,
+        .quick-switch-btn,
+        #syncActiveFolderBtn,
+        #loadMoreBtn,
+        #lightboxDownloadBtn,
+        #videoDownloadBtn {
+            background-color: #722234 !important;
+            color: #ffffff !important;
+            border-color: #722234 !important;
+            box-shadow: 0 2px 6px rgba(114, 34, 52, 0.25) !important;
+        }
+        .nav-btn-primary:hover,
+        .quick-switch-btn:hover,
+        #syncActiveFolderBtn:hover,
+        #loadMoreBtn:hover,
+        #lightboxDownloadBtn:hover,
+        #videoDownloadBtn:hover {
+            background-color: #541120 !important;
+            border-color: #541120 !important;
+            box-shadow: 0 4px 10px rgba(114, 34, 52, 0.35) !important;
+        }
+        .nav-btn-outline,
+        #refreshGalleryBtn,
+        #openInDriveBtn,
+        #headerBackBtn,
+        #lightboxDriveBtn,
+        #videoDriveBtn {
+            color: #4a1521 !important;
+            border: 1.5px solid rgba(74, 21, 33, 0.22) !important;
+            background: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(74, 21, 33, 0.05) !important;
+        }
+        .nav-btn-outline:hover,
+        #refreshGalleryBtn:hover,
+        #openInDriveBtn:hover,
+        #headerBackBtn:hover,
+        #lightboxDriveBtn:hover,
+        #videoDriveBtn:hover {
+            background: #fbf4f5 !important;
+            color: #541120 !important;
+            border-color: #722234 !important;
+        }
+        .folder-badge {
+            background-color: #fbf4f5 !important;
+            color: #4a1521 !important;
+            border: 1px solid rgba(74, 21, 33, 0.18) !important;
+        }
+        .folder-card {
+            border: 1px solid #e8e0d5 !important;
+            background: #ffffff !important;
+            color: #4a1521 !important;
+        }
+        .folder-card:hover,
+        .folder-card:focus,
+        .folder-card:focus-visible {
+            border-color: #722234 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(114, 34, 52, 0.18) !important;
+        }
+        .folder-card-icon {
+            background: #fbf4f5 !important;
+            color: #722234 !important;
+        }
+        .filter-chip {
+            color: #7a4d56 !important;
+        }
+        .filter-chip.active {
+            background: #ffffff !important;
+            color: #4a1521 !important;
+            box-shadow: 0 1px 4px rgba(74, 21, 33, 0.12) !important;
+        }
+        .breadcrumb-item {
+            color: #722234 !important;
+        }
+        .breadcrumb-item:hover {
+            background-color: #fbf4f5 !important;
+            color: #541120 !important;
+        }
+        .breadcrumb-item.active {
+            color: #4a1521 !important;
+        }
+        .quick-switch-input:focus,
+        .search-box input:focus {
+            border-color: #722234 !important;
+            box-shadow: 0 0 0 3px rgba(114, 34, 52, 0.15) !important;
+        }
+        .spinner {
+            border: 3px solid rgba(114, 34, 52, 0.2) !important;
+            border-top-color: #722234 !important;
+        }
+        .action-icon-btn {
+            background: #fbf4f5 !important;
+            color: #4a1521 !important;
+        }
+        .action-icon-btn:hover {
+            background: #f3e6e8 !important;
+            color: #541120 !important;
+        }
+        *:focus-visible {
+            outline: 2px solid #722234 !important;
+            outline-offset: 2px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="gallery-navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="javascript:void(0)" onclick="openSuvWelcomePopup()" class="brand-link" title="Click to view Welcome Greeting">
+                    <div class="brand-logo" style="padding: 2px; background: transparent;">
+                        <img src="/static/img/suv_badge.png" alt="SUV Photography Logo" style="width: 40px; height: 40px; border-radius: 10px; object-fit: contain;">
+                    </div>
+                    <div>
+                        <h1 class="brand-title">SUV Photography Arakkonam</h1>
+                        <span class="brand-subtitle">Google Drive Event Gallery &bull; Powered directly by Google Drive API &bull; Zero local duplication</span>
+                    </div>
+                </a>
+            </div>
+            <div class="nav-actions">
+                <a href="/guest" class="nav-btn nav-btn-outline">👁️ Guest Search</a>
+                <a href="/dashboard" class="nav-btn nav-btn-primary">⚙️ Host Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="gallery-main">
+        <!-- Breadcrumb & Control Bar -->
+        <section class="control-bar card">
+            <div class="breadcrumb-container">
+                <span class="breadcrumb-icon">📂</span>
+                <nav id="breadcrumbs" class="breadcrumbs" aria-label="Folder Navigation">
+                    <span class="breadcrumb-item active">Loading folders...</span>
+                </nav>
+            </div>
+
+            <div class="filter-controls">
+                <!-- Direct Google Drive Link Switcher -->
+                <form id="quickSwitchForm" class="quick-switch-form">
+                    <input type="text" id="quickFolderUrl" class="quick-switch-input" placeholder="Paste Drive link to load...">
+                    <button type="submit" class="nav-btn nav-btn-sm nav-btn-primary quick-switch-btn">⚡ Load Link</button>
+                </form>
+
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="gallerySearch" placeholder="Filter by filename...">
+                </div>
+
+                <div class="type-filter-group">
+                    <button type="button" class="filter-chip active" data-type="all">All (<span id="countAll">0</span>)</button>
+                    <button type="button" class="filter-chip" data-type="photos">Photos (<span id="countPhotos">0</span>)</button>
+                    <button type="button" class="filter-chip" data-type="videos">Videos (<span id="countVideos">0</span>)</button>
+                </div>
+
+                <button type="button" id="refreshGalleryBtn" class="nav-btn nav-btn-sm nav-btn-outline" title="Refresh from Google Drive">
+                    🔄 Refresh
+                </button>
+            </div>
+        </section>
+
+        <!-- Current Folder Info Banner -->
+        <section class="folder-header-card card">
+            <div class="folder-header-content">
+                <div>
+                    <div class="folder-badge">📁 Google Drive Primary Storage</div>
+                    <div class="folder-title-row">
+                        <button type="button" id="headerBackBtn" class="header-return-btn" title="Back to parent folder (←)" style="display: none;">
+                            <span class="return-arrow-icon">←</span>
+                            <span class="return-arrow-text">Back</span>
+                        </button>
+                        <h2 id="currentFolderName" class="current-folder-title">Event Gallery</h2>
+                    </div>
+                    <p id="currentFolderDesc" class="current-folder-desc">Fetching media directly from Google Cloud Drive...</p>
+                </div>
+                <div class="folder-header-actions">
+                    <button type="button" id="syncActiveFolderBtn" class="nav-btn nav-btn-primary">
+                        ⚡ Index Faces for this Event
+                    </button>
+                    <a id="openInDriveBtn" href="#" target="_blank" class="nav-btn nav-btn-outline">
+                        ↗️ View in Drive
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Subfolders Grid (Client-wise & Event-wise) -->
+        <section id="subfoldersSection" class="subfolders-section" style="display: none;">
+            <h3 class="section-heading">Subfolders &amp; Collections</h3>
+            <div id="subfoldersGrid" class="subfolders-grid"></div>
+        </section>
+
+        <!-- Loading State -->
+        <div id="galleryLoading" class="loading-state">
+            <div class="spinner"></div>
+            <p>Fetching files and media directly from Google Drive API...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="galleryEmpty" class="empty-state card" style="display: none;">
+            <div class="empty-icon">📂</div>
+            <h3>No Media Files Found</h3>
+            <p>This folder does not contain any photos or videos yet, or they are in a subfolder above.</p>
+        </div>
+
+        <!-- Media Grid (Photos & Videos) -->
+        <section id="mediaSection" class="media-section" style="display: none;">
+            <div id="mediaGrid" class="media-grid"></div>
+            
+            <div id="loadMoreContainer" class="load-more-container" style="display: none;">
+                <button type="button" id="loadMoreBtn" class="nav-btn nav-btn-secondary">
+                    ⬇️ Load More from Drive
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Photo Lightbox Modal -->
+    <div id="lightboxModal" class="lightbox-overlay" style="display: none;">
+        <button type="button" id="closeLightboxBtn" class="lightbox-close" aria-label="Close Lightbox">&times;</button>
+        <div class="lightbox-container">
+            <img id="lightboxImage" src="" alt="Google Drive Photo">
+            <div class="lightbox-meta-bar">
+                <div class="lightbox-info">
+                    <strong id="lightboxTitle">photo.jpg</strong>
+                    <span id="lightboxDims">1920x1080</span>
+                </div>
+                <div class="lightbox-actions">
+                    <a id="lightboxDownloadBtn" href="#" download class="nav-btn nav-btn-primary nav-btn-sm">
+                        ⬇️ Download High-Res
+                    </a>
+                    <a id="lightboxDriveBtn" href="#" target="_blank" class="nav-btn nav-btn-outline nav-btn-sm">
+                        ↗️ Open in Drive
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="lightbox-overlay" style="display: none;">
+        <button type="button" id="closeVideoBtn" class="lightbox-close" aria-label="Close Video Player">&times;</button>
+        <div class="video-modal-container">
+            <div class="video-wrapper">
+                <video id="videoPlayer" controls playsinline preload="metadata">
+                    <source id="videoSource" src="" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="lightbox-meta-bar">
+                <div class="lightbox-info">
+                    <strong id="videoTitle">video.mp4</strong>
+                    <span id="videoDuration">Video</span>
+                </div>
+                <div class="lightbox-actions">
+                    <a id="videoDownloadBtn" href="#" download class="nav-btn nav-btn-primary nav-btn-sm">
+                        ⬇️ Download Video
+                    </a>
+                    <a id="videoDriveBtn" href="#" target="_blank" class="nav-btn nav-btn-outline nav-btn-sm">
+                        ↗️ Open in Drive
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initial folder ID passed safely via data attribute -->
+    <div id="galleryConfig" data-initial-folder-id="{{ folder_id or '' }}" data-root-folder-id="{{ root_folder_id or '' }}" style="display: none;"></div>
+
+    <script src="/static/js/gallery.js"></script>
+</body>
+</html>

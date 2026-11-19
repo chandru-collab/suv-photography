@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Event Host Dashboard - SUV Photography Studio Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;700;800&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=20261119_black_v2">
+</head>
+<body class="dashboard-body">
+    <!-- Studio Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <a href="https://www.suvphotography.com/" target="_blank" rel="noopener noreferrer" class="nav-brand" style="text-decoration: none; color: inherit;" title="Visit SUV Photography Official Website (https://www.suvphotography.com/)">
+                <div class="nav-logo-box" title="SUV Photography Studio">
+                    <img src="/static/img/suv_monogram_black.png?v=20261119_black_v2" alt="SUV Photography Logo" class="nav-logo-img">
+                </div>
+                <div class="nav-brand-text">
+                    <div class="nav-title-row">
+                        <span class="nav-title">SUV Photography</span>
+                        <span class="nav-edition-pill">Studio Pro</span>
+                    </div>
+                    <span class="nav-subtitle" id="navEventName">Host Dashboard &bull; {{ settings.event_name }}</span>
+                </div>
+            </a>
+
+            <div class="nav-status-indicator">
+                <span class="live-dot"></span>
+                <span class="live-text">Live Event: <strong>{{ settings.event_name }}</strong></span>
+            </div>
+
+            <div class="nav-actions">
+                <a href="/gallery" target="_blank" class="btn btn-secondary btn-sm nav-action-btn">
+                    <span>📁</span> Drive Gallery
+                </a>
+                <a href="/guest" target="_blank" class="btn btn-outline btn-sm nav-action-btn">
+                    <span>👁️</span> Open Guest Page
+                </a>
+                <button type="button" class="btn btn-danger btn-sm nav-action-btn" id="logoutBtn">
+                    <span>🚪</span> Log Out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Studio Hero Welcome Banner -->
+    <div class="studio-hero-bar">
+        <div class="hero-container">
+            <div class="hero-left">
+                <div class="hero-tag">✨ Host Control Center &bull; Real-time AI Operations</div>
+                <h1 class="hero-title">Studio Event &amp; Media Management</h1>
+                <p class="hero-desc">Manage guest landing cover, facial recognition embeddings, Google Drive live synchronization, and QR scan distribution.</p>
+            </div>
+            <div class="hero-quick-shortcuts">
+                <a href="/guest" target="_blank" class="hero-pill-btn">
+                    <span>👁️</span> Preview Wedding Cover
+                </a>
+                <a href="/gallery" target="_blank" class="hero-pill-btn">
+                    <span>📂</span> Drive Explorer
+                </a>
+                <a href="/api/dashboard/qr/download" class="hero-pill-btn">
+                    <span>⬇️</span> Download QR Poster
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Stats Row with Enhanced Luxury Cards -->
+        <div class="stats-grid">
+            <div class="stat-card stat-card-rose">
+                <div class="stat-icon-wrapper bg-rose-glow">🖼️</div>
+                <div class="stat-meta">
+                    <div class="stat-value" id="statTotalPhotos">{{ stats.total_photos }}</div>
+                    <div class="stat-label">Total Photos Synced</div>
+                    <div class="stat-hint">Active in Drive &amp; Local</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-wine">
+                <div class="stat-icon-wrapper bg-wine-glow">👤</div>
+                <div class="stat-meta">
+                    <div class="stat-value" id="statTotalFaces">{{ stats.total_faces }}</div>
+                    <div class="stat-label">Total Faces Indexed</div>
+                    <div class="stat-hint">SFace 128D AI Embeddings</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-gold">
+                <div class="stat-icon-wrapper bg-gold-glow">👥</div>
+                <div class="stat-meta">
+                    <div class="stat-value" id="statMultiFaces">{{ stats.multi_face_photos }}</div>
+                    <div class="stat-label">Group Photos</div>
+                    <div class="stat-hint">Frames with &gt;1 Person</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-violet">
+                <div class="stat-icon-wrapper bg-violet-glow">🎯</div>
+                <div class="stat-meta">
+                    <div class="stat-value" id="statThreshold">{{ settings.match_threshold }}</div>
+                    <div class="stat-label">Match Threshold</div>
+                    <div class="stat-hint">Cosine Similarity Strictness</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Card 1: Default Event QR Code -->
+            <div class="card card-qr">
+                <div class="card-header">
+                    <div>
+                        <h2>1. Event Guest QR Code</h2>
+                        <span class="card-sublabel">Instant guest access to selfie search</span>
+                    </div>
+                    <span class="badge badge-success">SUV Photography Edition</span>
+                </div>
+                <div class="card-body qr-section">
+                    <div class="qr-preview-box">
+                        <div class="qr-image-wrapper">
+                            <img id="qrImage" src="{{ qr_data }}" alt="Event QR Code" class="qr-image">
+                        </div>
+                        <p class="qr-caption">Event QR with centered SUV logo</p>
+                        <div class="qr-mini-actions">
+                            <a href="{{ guest_url }}" target="_blank" class="qr-mini-btn" title="Open Guest Page">👁️ Open</a>
+                            <button type="button" class="qr-mini-btn" id="printQrBtn" title="Print QR Standee">🖨️ Print</button>
+                        </div>
+                    </div>
+                    <div class="qr-details">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Guest Page Access URL</label>
+                            <div class="input-with-button">
+                                <input type="text" id="guestUrlInput" value="{{ guest_url }}" readonly>
+                                <button type="button" class="btn btn-secondary btn-sm" id="copyUrlBtn">📋 Copy</button>
+                            </div>
+                            <small class="form-hint">Guests scan or click to open their personalized selfie search.</small>
+                        </div>
+
+                        <div class="qr-info-box">
+                            <span class="qr-info-icon">⚡</span>
+                            <div class="qr-info-text">
+                                <strong>Direct Mobile Scanning</strong>
+                                <span>Point any iOS or Android camera at this QR code to access instant selfie-matching without app installs.</span>
+                            </div>
+                        </div>
+
+                        <div class="qr-actions-row">
+                            <a id="downloadQrBtn" href="/api/dashboard/qr/download" class="btn btn-primary btn-block">
+                                ⬇️ Download High-Res QR Code (PNG)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Google Drive Primary Storage & Integration -->
+            <div class="card card-drive">
+                <div class="card-header">
+                    <div>
+                        <h2>2. Google Drive Primary Storage</h2>
+                        <span class="card-sublabel">Real-time cloud database &amp; media repository</span>
+                    </div>
+                    <span class="badge badge-success">🟢 Google Cloud Connected</span>
+                </div>
+                <div class="card-body">
+                    <p class="section-desc">
+                        Your Google Drive folder serves as the <strong>primary storage source</strong> for all event photos and videos. Media is streamed directly via Drive API without local duplicates.
+                    </p>
+
+                    <div class="drive-quick-actions">
+                        <a href="/gallery" target="_blank" class="btn btn-secondary btn-block">
+                            📂 Open Interactive Drive Gallery &amp; Folder Explorer
+                        </a>
+                    </div>
+
+                    <form id="driveSyncForm" class="sync-form" style="display: flex; flex-direction: column; flex: 1;">
+                        <div class="form-group">
+                            <label for="driveUrl">Google Drive Folder Link / ID</label>
+                            <div class="input-icon-wrap">
+                                <span class="field-icon">🔗</span>
+                                <input type="text" id="driveUrl" name="driveUrl" placeholder="https://drive.google.com/drive/folders/1ABC..." value="{{ settings.drive_folder_url }}">
+                            </div>
+                            <small class="form-hint">Paste any Google Drive link or subfolder to instantly switch events.</small>
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary btn-block" id="startSyncBtn">
+                                🔄 Fast Face Indexing
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Live Sync Progress Card -->
+                    <div id="syncProgressContainer" class="sync-progress-box" style="display: none;">
+                        <div class="sync-progress-header">
+                            <span id="syncActionText">Connecting to Drive API...</span>
+                            <span id="syncPercentText">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div id="syncProgressBar" class="progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="sync-metrics">
+                            <span>Found: <strong id="syncFound">0</strong></span>
+                            <span>Indexed: <strong id="syncAdded">0</strong></span>
+                            <span>Skipped: <strong id="syncSkipped">0</strong></span>
+                            <span>Faces: <strong id="syncFaces">0</strong></span>
+                        </div>
+                        <div style="text-align: right; margin-top: 8px;">
+                            <button type="button" id="cancelSyncBtn" class="btn btn-danger btn-sm">⏹️ Cancel Sync</button>
+                        </div>
+                    </div>
+
+                    <div id="syncResultBanner" class="alert" style="display: none; margin-top: 12px;"></div>
+                </div>
+            </div>
+
+            <!-- Card 3: Event Details & Wedding Cover Settings with Live Phone Mockup -->
+            <div class="card card-settings">
+                <div class="card-header">
+                    <div>
+                        <h2>3. Event Details &amp; Wedding Cover Screen</h2>
+                        <span class="card-sublabel">Personalize guest landing page and AI strictness</span>
+                    </div>
+                    <span class="badge badge-accent">📱 Live Mobile Mockup</span>
+                </div>
+                <div class="card-body">
+                    <div class="cover-editor-layout">
+                        <!-- Left: Settings Form -->
+                        <form id="settingsForm" class="cover-form-col">
+                            <!-- Couple / Bride & Groom Names -->
+                            <div class="form-group">
+                                <label for="coupleTitleInput">Bride &amp; Groom Names (Cover Script)</label>
+                                <div class="input-icon-wrap">
+                                    <span class="field-icon">💍</span>
+                                    <input type="text" id="coupleTitleInput" value="{{ settings.couple_title or 'Bride & Groom' }}" placeholder="e.g. darshan & mavya">
+                                </div>
+                                <small class="form-hint">Displayed in elegant calligraphy on the guest landing cover screen.</small>
+                            </div>
+
+                            <!-- Date & Location in 2 Columns -->
+                            <div class="date-loc-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label for="eventDateInput">Wedding / Event Date</label>
+                                    <div class="input-icon-wrap">
+                                        <span class="field-icon">📅</span>
+                                        <input type="text" id="eventDateInput" value="{{ settings.event_date or '17 NOV 2026' }}" placeholder="e.g. 17 NOV 2026">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label for="eventLocationInput">Location / City</label>
+                                    <div class="input-icon-wrap">
+                                        <span class="field-icon">📍</span>
+                                        <input type="text" id="eventLocationInput" value="{{ settings.event_location or 'CHENNAI' }}" placeholder="e.g. CHENNAI">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cover Photo Manager -->
+                            <div class="form-group">
+                                <label>Landing Page Cover Portrait</label>
+                                <div class="cover-manager-box">
+                                    <img id="coverPhotoPreview" src="{{ settings.cover_photo_path or '/static/img/default_wedding_cover_clean.jpg' }}" alt="Cover Photo Preview" class="cover-preview-img">
+                                    <div class="cover-manager-details">
+                                        <div class="cover-manager-btn-row">
+                                            <label for="coverPhotoFileInput" class="btn btn-secondary btn-sm cover-btn">
+                                                📷 Change Photo
+                                            </label>
+                                            <input type="file" id="coverPhotoFileInput" accept="image/*" style="display: none;">
+                                            <button type="button" class="btn btn-outline btn-sm cover-btn" id="resetCoverPhotoBtn">
+                                                ↺ Reset Default
+                                            </button>
+                                            <a href="/guest" target="_blank" class="btn btn-outline btn-sm cover-btn">
+                                                👁️ Full Preview
+                                            </a>
+                                        </div>
+                                        <small id="coverPhotoStatus" class="form-hint" style="margin: 0;">Portrait orientation JPG/PNG recommended.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- System Event Album Name -->
+                            <div class="form-group">
+                                <label for="eventNameInput">System Event Album Name</label>
+                                <div class="input-icon-wrap">
+                                    <span class="field-icon">🏷️</span>
+                                    <input type="text" id="eventNameInput" value="{{ settings.event_name }}">
+                                </div>
+                            </div>
+
+                            <!-- Face Match Threshold -->
+                            <div class="form-group">
+                                <label for="thresholdInput">
+                                    Face Match Threshold: <strong id="thresholdVal">{{ settings.match_threshold }}</strong>
+                                </label>
+                                <input type="range" id="thresholdSlider" min="0.30" max="0.65" step="0.01" value="{{ settings.match_threshold }}">
+                                <div class="slider-labels">
+                                    <span>Looser (0.35)</span>
+                                    <span>Recommended (0.48)</span>
+                                    <span>Strict (0.60)</span>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 6px;">
+                                <button type="submit" class="btn btn-primary btn-block" id="saveSettingsBtn">💾 Save Event &amp; Cover Details</button>
+                            </div>
+                        </form>
+
+                        <!-- Right: Live Mini Phone Mockup -->
+                        <div class="cover-mockup-col">
+                            <div class="mini-phone-frame">
+                                <div class="mini-phone-speaker"></div>
+                                <div class="mini-phone-screen">
+                                    <img id="miniMockupImg" src="{{ settings.cover_photo_path or '/static/img/default_wedding_cover_clean.jpg' }}" alt="Live Mockup" class="mini-mockup-bg">
+                                    <div class="mini-mockup-gradient"></div>
+                                    <div class="mini-mockup-content">
+                                        <div class="mini-mockup-header">
+                                            <img src="/static/img/suv_cover_logo.png?v=20261119" alt="SUV Photography" class="mini-mockup-logo">
+                                        </div>
+                                        <div class="mini-mockup-bottom">
+                                            <div id="miniMockupNames" class="mini-mockup-names">{{ settings.couple_title or 'Bride & Groom' }}</div>
+                                            <div class="mini-mockup-ornament">✦ ─── ❀ ─── ✦</div>
+                                            <div id="miniMockupDate" class="mini-mockup-date">{{ settings.event_date or '17 NOV 2026' }}</div>
+                                            <div id="miniMockupLoc" class="mini-mockup-loc">{{ settings.event_location or 'CHENNAI' }}</div>
+                                            <div class="mini-mockup-btn">View Gallery &rarr;</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="mockup-note">✨ Real-time Guest Mobile Preview</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Direct Upload Option & Local Ingest Engine -->
+            <div class="card card-upload">
+                <div class="card-header">
+                    <div>
+                        <h2>4. Direct Photo Upload / Local Drop</h2>
+                        <span class="card-sublabel">Offline ingest &amp; instant local AI indexing</span>
+                    </div>
+                    <span class="badge badge-warning">⚡ Hardware Accelerated</span>
+                </div>
+                <div class="card-body" style="display: flex; flex-direction: column;">
+                    <p class="section-desc">Drop event photos directly here for immediate local testing, on-site live printing, or offline studio events.</p>
+                    
+                    <div id="dropzone" class="dropzone-modern">
+                        <div class="dropzone-inner">
+                            <div class="dropzone-icon-glow">📁</div>
+                            <h3 class="dropzone-title">Drag &amp; Drop Event Photos Here</h3>
+                            <p class="dropzone-subtitle">or click anywhere to browse from your device</p>
+                            <div class="dropzone-tags">
+                                <span class="tag-pill">JPG</span>
+                                <span class="tag-pill">PNG</span>
+                                <span class="tag-pill">WEBP</span>
+                                <span class="tag-pill">High-Res 4K</span>
+                            </div>
+                        </div>
+                        <input type="file" id="directUploadInput" multiple accept="image/*" style="display: none;">
+                    </div>
+
+                    <div id="uploadStatus" class="alert alert-info" style="display: none; margin-top: 12px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js?v=20261118_v2"></script>
+</body>
+</html>

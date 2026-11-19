@@ -1,0 +1,55 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "cleanUrls": true,
+  "public": true,
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://suv-photography-backend.onrender.com/api/:match*"
+    },
+    {
+      "source": "/healthz",
+      "destination": "https://suv-photography-backend.onrender.com/healthz"
+    },
+    {
+      "source": "/readyz",
+      "destination": "https://suv-photography-backend.onrender.com/readyz"
+    },
+    {
+      "source": "/metrics",
+      "destination": "https://suv-photography-backend.onrender.com/metrics"
+    },
+    {
+      "source": "/",
+      "destination": "/templates/guest.html"
+    },
+    {
+      "source": "/guest",
+      "destination": "/templates/guest.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/templates/dashboard.html"
+    },
+    {
+      "source": "/gallery",
+      "destination": "/templates/gallery.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/templates/login.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    }
+  ]
+}

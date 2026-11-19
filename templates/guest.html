@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{{ event_name or 'Celebration Gallery' }} - SUV Photography Arakkonam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;600;700;800&family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+           SUV Photography Arakkonam - Cream & French Wine Theme
+           Cream: #f8f5f0 | French Wine: #4a1521
+           ========================================================================== */
+        :root {
+            --cream-bg: #f8f5f0;
+            --cream-card: #ffffff;
+            --french-wine: #4a1521;
+            --french-wine-deep: #380c16;
+            --french-wine-medium: #722234;
+            --french-wine-light: #8b263e;
+            --french-wine-muted: #7a4d56;
+            --wine-rose: #722234;
+            --wine-rose-hover: #8b263e;
+            --wine-glow: rgba(114, 34, 52, 0.25);
+            --welcome-cyan: #722234;
+            --welcome-blue: #4a1521;
+            --welcome-blue-hover: #5d1a29;
+            --border-wine: rgba(74, 21, 33, 0.14);
+            --radius-md: 14px;
+            --radius-lg: 26px;
+            --radius-full: 9999px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: #f8f5f0 !important;
+            background: radial-gradient(circle at 50% 12%, #ffffff 0%, #faf6f0 45%, #eee8df 100%) fixed !important;
+            color: #4a1521 !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 16px 14px 40px;
+            box-sizing: border-box;
+        }
+
+        /* Top Bar */
+        .suv-topbar {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding: 6px 2px;
+        }
+
+        .suv-brand-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .suv-brand-group:hover, .suv-brand-group:active {
+            transform: translateY(-1px) scale(1.02);
+            opacity: 0.88;
+        }
+
+        .suv-footer-link {
+            color: #722234;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s ease, text-decoration 0.2s ease;
+        }
+        .suv-footer-link:hover {
+            color: #4a1521;
+            text-decoration: underline;
+        }
+
+        .suv-brand-logo-box {
+            width: auto;
+            height: 38px;
+            background: transparent;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px 0 0;
+            border: none;
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+
+        .suv-brand-logo-img {
+            height: 34px !important;
+            width: auto !important;
+            max-width: 80px !important;
+            object-fit: contain;
+            display: block;
+        }
+
+        .suv-brand-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .suv-brand-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            color: #4a1521;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .suv-brand-tag {
+            font-size: 0.72rem;
+            color: #7a4d56;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        .suv-icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.16);
+            color: #4a1521;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(74, 21, 33, 0.08);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .suv-icon-btn:hover {
+            background: #faf6f0;
+            border-color: #722234;
+            transform: scale(1.05);
+        }
+
+        .suv-icon-btn.playing {
+            background: rgba(114, 34, 52, 0.12);
+            border-color: #722234;
+            animation: suvMusicPulse 1.4s infinite ease-in-out;
+        }
+
+        @keyframes suvMusicPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(114, 34, 52, 0.35); }
+            50% { transform: scale(1.08); box-shadow: 0 0 14px 4px rgba(114, 34, 52, 0.2); }
+        }
+
+        /* Stepper Indicator (Step 1 of 2) */
+        .suv-stepper-row {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding: 0 4px;
+        }
+
+        .step-dash {
+            width: 32px;
+            height: 4px;
+            border-radius: 9999px;
+            background: rgba(74, 21, 33, 0.16);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .step-dash.active {
+            background: #722234;
+            box-shadow: 0 0 8px rgba(114, 34, 52, 0.4);
+        }
+
+        .step-label {
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            color: #722234;
+            text-transform: uppercase;
+        }
+
+        /* Main Container Card in Cream & French Wine */
+        .guest-main {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .suv-main-card {
+            width: 100%;
+            background: linear-gradient(160deg, #ffffff 0%, #faf6f0 55%, #f6f0e6 100%);
+            border: 1.5px solid rgba(74, 21, 33, 0.14);
+            border-radius: var(--radius-lg);
+            padding: 28px 22px 32px;
+            box-shadow: 0 20px 50px -15px rgba(74, 21, 33, 0.14),
+                        0 0 30px -10px rgba(114, 34, 52, 0.08),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .suv-main-card::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 260px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(114, 34, 52, 0.06) 0%, rgba(248, 245, 240, 0) 70%);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .suv-welcome-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 22px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .suv-sparkle-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            color: #722234;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            background: rgba(114, 34, 52, 0.08);
+            border: 1px solid rgba(114, 34, 52, 0.22);
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+        }
+
+        .suv-welcome-title {
+            font-family: 'Alex Brush', 'Great Vibes', cursive;
+            font-size: clamp(2.8rem, 7vw, 3.8rem);
+            font-weight: 400;
+            color: #380c16;
+            margin: 0 auto 2px auto;
+            text-align: center;
+            width: 100%;
+            line-height: 1.18;
+            letter-spacing: 0.01em;
+            text-shadow: 0 1px 2px rgba(74, 21, 33, 0.06);
+        }
+
+        .suv-filigree-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px auto 8px;
+            opacity: 0.9;
+        }
+
+        .suv-event-quote {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-style: italic;
+            font-size: 1.08rem;
+            font-weight: 500;
+            color: #581624;
+            margin: 0 auto 8px auto;
+            max-width: 440px;
+            line-height: 1.45;
+            letter-spacing: 0.02em;
+            text-align: center;
+        }
+
+        .suv-event-occasion-bar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #722234;
+            letter-spacing: 0.04em;
+            text-align: center;
+            background: rgba(114, 34, 52, 0.06);
+            border: 1px solid rgba(114, 34, 52, 0.16);
+            padding: 4px 14px;
+            border-radius: var(--radius-full);
+            margin: 0 auto 12px;
+        }
+
+        .privacy-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            color: #7a4d56;
+            background: rgba(74, 21, 33, 0.05);
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(74, 21, 33, 0.12);
+        }
+
+        /* Buttons & Initial Capture Options */
+        .capture-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            outline: none;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .suv-btn-primary {
+            background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
+            color: #ffffff;
+            border: 1px solid rgba(74, 21, 33, 0.35);
+            box-shadow: 0 10px 22px -5px rgba(74, 21, 33, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .suv-btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #8b263e 0%, #591927 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px -5px rgba(74, 21, 33, 0.5);
+        }
+
+        .suv-btn-primary:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .suv-btn-secondary {
+            background: #ffffff;
+            color: #4a1521;
+            border: 1.5px solid rgba(74, 21, 33, 0.22);
+            box-shadow: 0 4px 12px rgba(74, 21, 33, 0.05);
+        }
+
+        .suv-btn-secondary:hover {
+            background: #fdfaf6;
+            border-color: #722234;
+            color: #380c16;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(74, 21, 33, 0.08);
+        }
+
+        .btn-icon {
+            font-size: 1.5rem;
+        }
+
+        .btn-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            line-height: 1.25;
+        }
+
+        .btn-text strong {
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .btn-text small {
+            font-size: 0.78rem;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #8c5a64;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(74, 21, 33, 0.15);
+        }
+
+        .divider span {
+            padding: 0 12px;
+        }
+
+        /* Circular Camera / Preview Portal with Animated Laser Scan */
+        .scan-portal-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 10px auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3.5px solid #722234;
+            box-shadow: 0 0 30px rgba(114, 34, 52, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.4);
+            background: #180309;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .scan-portal-container.scanned {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.55), inset 0 0 25px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .scan-verified-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            background: #10b981;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border: 2.5px solid #ffffff;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.85);
+            z-index: 10;
+            animation: badgePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes badgePop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .scan-portal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Subtle Face Alignment Grid Overlay */
+        .scan-grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-size: 22px 22px;
+            background-image:
+                linear-gradient(to right, rgba(114, 34, 52, 0.15) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(114, 34, 52, 0.15) 1px, transparent 1px);
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        /* Laser Sweep Scanline */
+        .scan-laser-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #8b263e 50%, transparent);
+            box-shadow: 0 0 15px 3px rgba(139, 38, 62, 0.8);
+            pointer-events: none;
+            animation: laserSweep 2s ease-in-out infinite alternate;
+            z-index: 5;
+        }
+
+        @keyframes laserSweep {
+            0% { top: 4%; opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { top: 96%; opacity: 0.6; }
+        }
+
+        /* Real-Time Facial Analysis Status & Progress Bar */
+        .analysis-box {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .analysis-progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(74, 21, 33, 0.12);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .analysis-progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #722234, #a52744, #722234);
+            border-radius: 9999px;
+            transition: width 0.35s ease;
+            box-shadow: 0 0 10px rgba(114, 34, 52, 0.5);
+        }
+
+        .analysis-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #4a1521;
+            line-height: 1.3;
+        }
+
+        .analysis-percent {
+            font-size: 0.95rem;
+            color: #722234;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .cancel-link-btn {
+            background: none;
+            border: none;
+            color: #7a4d56;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 14px;
+            display: inline-block;
+            transition: color 0.2s ease;
+        }
+
+        .cancel-link-btn:hover {
+            color: #4a1521;
+        }
+
+        /* Duo / Multiple Faces Detected Box */
+        .duo-box {
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.2);
+            border-radius: var(--radius-md);
+            padding: 18px 16px;
+            margin-bottom: 18px;
+            text-align: left;
+            box-shadow: 0 4px 16px rgba(74, 21, 33, 0.06);
+        }
+
+        .duo-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .duo-icon {
+            font-size: 1.8rem;
+        }
+
+        .duo-header strong {
+            display: block;
+            font-size: 0.95rem;
+            color: #380c16;
+        }
+
+        .duo-header p {
+            font-size: 0.8rem;
+            color: #7a4d56;
+        }
+
+        .face-chips {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+        }
+
+        .face-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: #fbf9f5;
+            border: 1.5px solid rgba(74, 21, 33, 0.16);
+            border-radius: 12px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .face-chip.active {
+            border-color: #722234;
+            background: rgba(114, 34, 52, 0.08);
+            box-shadow: 0 0 10px rgba(114, 34, 52, 0.25);
+        }
+
+        .face-chip-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .face-chip-label {
+            font-size: 0.72rem;
+            color: #4a1521;
+            font-weight: 700;
+        }
+
+        .duo-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-duo-together {
+            background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
+            color: #ffffff;
+            padding: 14px 18px;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.25;
+            box-shadow: 0 8px 20px rgba(74, 21, 33, 0.3);
+            border: 1px solid rgba(74, 21, 33, 0.3);
+        }
+
+        .btn-duo-together small, .btn-duo-either small {
+            font-size: 0.72rem;
+            opacity: 0.85;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .btn-duo-either {
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.22);
+            color: #4a1521;
+            padding: 14px 18px;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.25;
+            box-shadow: 0 4px 12px rgba(74, 21, 33, 0.05);
+        }
+
+        /* ==========================================================================
+           Step 2: Scanning Face Features & Concentric Radar Animation
+           ========================================================================== */
+        /* Top Navigation Header on Step 2 */
+        .results-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .results-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.2);
+            color: #4a1521;
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(74, 21, 33, 0.06);
+        }
+
+        .results-back-btn:hover {
+            background: #faf6f0;
+            border-color: #722234;
+        }
+
+        .results-title-group h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #4a1521;
+        }
+
+        .results-title-group span {
+            font-size: 0.76rem;
+            color: #722234;
+            font-weight: 700;
+        }
+
+        /* User Photo Banner Card with Green Checkmark */
+        .user-photo-banner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.14);
+            border-radius: 18px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 14px rgba(74, 21, 33, 0.06);
+        }
+
+        .user-avatar-wrap {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2.5px solid #722234;
+            box-shadow: 0 0 10px rgba(114, 34, 52, 0.25);
+        }
+
+        .user-check-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+        }
+
+        .user-photo-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .user-photo-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #4a1521;
+        }
+
+        .user-photo-matches {
+            font-size: 0.82rem;
+            color: #7a4d56;
+            font-weight: 500;
+        }
+
+        /* Concentric Radar Scanning Animation */
+        .radar-scanning-card {
+            text-align: center;
+            padding: 40px 20px 36px;
+        }
+
+        .radar-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-ring-dashed {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px dashed rgba(74, 21, 33, 0.2);
+        }
+
+        .radar-arc-outer {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3.5px solid transparent;
+            border-top-color: #722234;
+            border-right-color: #722234;
+            animation: radarRotate 2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(114, 34, 52, 0.5));
+        }
+
+        .radar-arc-inner {
+            position: absolute;
+            inset: 18px;
+            border-radius: 50%;
+            border: 2.5px solid transparent;
+            border-bottom-color: #a52744;
+            border-left-color: #a52744;
+            animation: radarRotateRev 2.8s linear infinite;
+            filter: drop-shadow(0 0 6px rgba(165, 39, 68, 0.45));
+        }
+
+        .radar-center-box {
+            width: 74px;
+            height: 74px;
+            background: #ffffff;
+            border: 2px solid #722234;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 0 25px rgba(114, 34, 52, 0.25), inset 0 0 12px rgba(114, 34, 52, 0.08);
+            animation: radarPulse 1.6s ease-in-out infinite alternate;
+            z-index: 2;
+        }
+
+        @keyframes radarRotate {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes radarRotateRev {
+            to { transform: rotate(-360deg); }
+        }
+
+        @keyframes radarPulse {
+            0% { transform: scale(0.96); box-shadow: 0 0 15px rgba(114, 34, 52, 0.2); }
+            100% { transform: scale(1.06); box-shadow: 0 0 30px rgba(114, 34, 52, 0.4); }
+        }
+
+        .radar-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #380c16;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .radar-desc {
+            font-size: 0.92rem;
+            color: #7a4d56;
+            max-width: 340px;
+            margin: 0 auto;
+            line-height: 1.45;
+        }
+
+        /* Results Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+            margin-bottom: 24px;
+        }
+
+        .photo-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #ffffff;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(74, 21, 33, 0.08);
+            border: 1.5px solid rgba(74, 21, 33, 0.14);
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .photo-card:hover {
+            transform: scale(1.03);
+            border-color: #722234;
+            box-shadow: 0 8px 20px rgba(74, 21, 33, 0.16);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-card .score-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(74, 21, 33, 0.88);
+            backdrop-filter: blur(4px);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .photo-card .download-icon-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a1521;
+            font-size: 0.85rem;
+            border: 1px solid rgba(74, 21, 33, 0.18);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .photo-card .download-icon-btn:hover {
+            background: #722234;
+            color: #ffffff;
+        }
+
+        .btn-download-all {
+            background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
+            border: 1px solid rgba(74, 21, 33, 0.35);
+            color: #ffffff;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            box-shadow: 0 6px 16px rgba(74, 21, 33, 0.3);
+            width: auto;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-all:hover {
+            background: linear-gradient(135deg, #8b263e 0%, #591927 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(74, 21, 33, 0.4);
+        }
+
+        /* Empty State */
+        .empty-card {
+            text-align: center;
+            padding: 36px 20px;
+        }
+
+        .empty-icon-wrap {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: rgba(74, 21, 33, 0.06);
+            border: 1.5px solid rgba(74, 21, 33, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 0 20px rgba(114, 34, 52, 0.15);
+        }
+
+        .empty-card h3 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #380c16;
+            margin-bottom: 8px;
+        }
+
+        .empty-card p {
+            font-size: 0.92rem;
+            color: #7a4d56;
+            margin-bottom: 14px;
+        }
+
+        .empty-card ul {
+            text-align: left;
+            margin: 0 auto 22px;
+            max-width: 360px;
+            font-size: 0.88rem;
+            color: #5c2430;
+            padding-left: 20px;
+            line-height: 1.65;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .alert-error {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            color: #9f1239;
+        }
+
+        .alert-info {
+            background: #fdfaf6;
+            border: 1px solid rgba(74, 21, 33, 0.2);
+            color: #4a1521;
+        }
+
+        /* Camera Modal (Live WebRTC stream) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(74, 21, 33, 0.5);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .camera-modal {
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.18);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(74, 21, 33, 0.25);
+        }
+
+        .camera-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(74, 21, 33, 0.12);
+        }
+
+        .camera-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #4a1521;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #4a1521;
+            font-size: 1.6rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .camera-feed-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #000000;
+        }
+
+        .camera-feed-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .camera-footer {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: center;
+            border-top: 1px solid rgba(74, 21, 33, 0.12);
+        }
+
+        .btn-capture {
+            width: 100%;
+            background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
+            color: #ffffff;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(74, 21, 33, 0.35);
+        }
+
+        /* Lightbox Modal */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(30, 8, 14, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 16px;
+            object-fit: contain;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .lightbox-bar {
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .lightbox-filename {
+            font-size: 0.85rem;
+            color: #f8f5f0;
+            max-width: 60%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Footer */
+        .suv-guest-footer {
+            text-align: center;
+            padding: 20px 16px 20px;
+            font-size: 0.8rem;
+            color: #7a4d56;
+            letter-spacing: 0.04em;
+            margin-top: 16px;
+        }
+
+        /* Tablet Viewports (iPad, Surface, Tabs) */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .suv-topbar,
+            .suv-stepper-row {
+                max-width: 540px;
+                transition: max-width 0.3s ease;
+            }
+            .guest-main {
+                max-width: 540px;
+                transition: max-width 0.3s ease;
+            }
+            .guest-main.has-results {
+                max-width: 900px;
+            }
+            body.results-mode .suv-topbar,
+            body.results-mode .suv-stepper-row {
+                max-width: 900px;
+            }
+            .photo-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 14px;
+            }
+            .wedding-cover-card {
+                max-width: 460px;
+                max-height: 90vh;
+                border-radius: 30px;
+            }
+        }
+
+        /* Laptop & Large Desktop Viewports */
+        @media (min-width: 1025px) {
+            .suv-topbar,
+            .suv-stepper-row {
+                max-width: 520px;
+                transition: max-width 0.3s ease;
+            }
+            .guest-main {
+                max-width: 520px;
+                transition: max-width 0.3s ease;
+            }
+            .guest-main.has-results {
+                max-width: 1140px;
+            }
+            body.results-mode .suv-topbar,
+            body.results-mode .suv-stepper-row {
+                max-width: 1140px;
+            }
+            .photo-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 10px 30px;
+            }
+            .suv-main-card {
+                padding: 24px 18px 28px;
+            }
+            .suv-welcome-content {
+                align-items: center;
+                text-align: center;
+            }
+            .suv-welcome-title {
+                font-size: clamp(2.4rem, 9vw, 3.0rem);
+                line-height: 1.15;
+                text-align: center;
+            }
+            .suv-event-quote {
+                font-size: 0.98rem;
+                text-align: center;
+            }
+            .scan-portal-container {
+                width: 200px;
+                height: 200px;
+            }
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+
+        /* ==========================================================================
+           1ST PHOTO REFERENCE: LUXURY WEDDING EVENT COVER SCREEN (RESPONSIVE)
+           ========================================================================== */
+        .wedding-cover-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 50% 35%, #340915 0%, #190208 70%, #0a0104 100%);
+            overflow: hidden;
+            transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+            box-sizing: border-box;
+            padding: 16px;
+        }
+
+        .wedding-cover-screen.cover-dismissed {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Luxury Showcase Card: Proportioned like reference phone mockup on Laptop */
+        .wedding-cover-card {
+            position: relative;
+            width: 100%;
+            max-width: 440px;
+            height: 100%;
+            max-height: 880px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 36px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            background-color: #2b0811;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(223, 199, 170, 0.3);
+            box-sizing: border-box;
+        }
+
+        .wedding-cover-card::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Mobile full-screen responsive */
+        @media (max-width: 640px) {
+            .wedding-cover-screen {
+                padding: 0 !important;
+                background: #2b0811 !important;
+            }
+            .wedding-cover-card {
+                max-width: 100vw !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+
+        /* Short screen & mobile landscape responsive support */
+        @media (max-height: 720px) {
+            .wedding-brand-header {
+                padding-top: max(10px, env(safe-area-inset-top, 10px)) !important;
+            }
+            .wedding-brand-logo-img {
+                height: 38px !important;
+                max-width: 130px !important;
+            }
+            .wedding-brand-sub {
+                display: none !important;
+            }
+            .wedding-cover-content {
+                padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+            }
+            .wedding-couple-script {
+                font-size: clamp(1.7rem, 5.5vh, 2.3rem) !important;
+                line-height: 1.1 !important;
+            }
+            .wedding-floral-ornament {
+                width: 110px !important;
+                height: 14px !important;
+                margin: 1px 0 2px !important;
+            }
+            .wedding-date-text {
+                font-size: 0.85rem !important;
+                letter-spacing: 3px !important;
+                margin-top: 1px !important;
+            }
+            .wedding-location-text {
+                font-size: 0.68rem !important;
+                letter-spacing: 3px !important;
+                margin-top: 2px !important;
+            }
+            .wedding-cta-row {
+                margin-top: 8px !important;
+            }
+            .wedding-view-gallery-btn {
+                padding: 8px 24px !important;
+                font-size: 0.88rem !important;
+            }
+        }
+
+        @media (max-height: 560px) {
+            .wedding-brand-header {
+                padding-top: max(6px, env(safe-area-inset-top, 6px)) !important;
+            }
+            .wedding-brand-logo-img {
+                height: 30px !important;
+                max-width: 105px !important;
+            }
+            .wedding-couple-script {
+                font-size: clamp(1.4rem, 4.8vh, 1.9rem) !important;
+            }
+            .wedding-floral-ornament {
+                display: none;
+            }
+            .wedding-cta-row {
+                margin-top: 6px !important;
+            }
+            .wedding-view-gallery-btn {
+                padding: 6px 20px !important;
+                font-size: 0.82rem !important;
+            }
+        }
+
+        /* Background image & gradient overlay */
+        .wedding-cover-bg-wrap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .wedding-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            filter: brightness(0.98) contrast(1.02);
+        }
+
+        .wedding-cover-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(35, 7, 14, 0.35) 0%,
+                rgba(35, 7, 14, 0.04) 15%,
+                rgba(40, 9, 17, 0.15) 38%,
+                rgba(48, 10, 20, 0.78) 64%,
+                #340a15 84%,
+                #24050d 100%
+            );
+        }
+
+        /* Top Branding: SUV Photography */
+        .wedding-brand-header {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: max(22px, env(safe-area-inset-top, 22px));
+            text-align: center;
+        }
+
+        .wedding-brand-logo-img {
+            height: 48px;
+            width: auto;
+            max-width: 160px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.65));
+            margin-bottom: 2px;
+        }
+
+        .wedding-brand-sub {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 3px;
+        }
+
+        .wedding-sub-line {
+            width: 28px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #dfc7aa);
+        }
+
+        .wedding-sub-line:last-child {
+            background: linear-gradient(90deg, #dfc7aa, transparent);
+        }
+
+        .wedding-sub-text {
+            font-family: 'Cinzel', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            color: #e5cfb5;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Bottom Romantic Couple Section */
+        .wedding-cover-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            max-width: 390px;
+            padding: 0 16px max(28px, env(safe-area-inset-bottom, 28px));
+            box-sizing: border-box;
+        }
+
+        .wedding-couple-script {
+            font-family: 'Alex Brush', 'Great Vibes', cursive;
+            font-size: clamp(2.2rem, 7vw, 3.4rem);
+            font-weight: 400;
+            color: #ffffff;
+            line-height: 1.15;
+            text-shadow: 0 3px 18px rgba(0, 0, 0, 0.8), 0 1px 4px rgba(0, 0, 0, 0.9);
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+            text-align: center;
+            word-break: normal;
+        }
+
+        .wedding-floral-ornament {
+            width: 150px;
+            height: 22px;
+            margin: 2px 0 6px;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+        }
+
+        .wedding-date-text {
+            font-family: 'Cinzel', 'Playfair Display', serif;
+            font-size: clamp(0.95rem, 2.8vw, 1.12rem);
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #f7ede2;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .wedding-location-text {
+            font-family: 'Cinzel', sans-serif;
+            font-size: clamp(0.75rem, 2vw, 0.82rem);
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: #dfc7aa;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .wedding-location-text .loc-dash {
+            color: rgba(223, 199, 170, 0.6);
+            font-weight: 300;
+        }
+
+        /* Call to Action Button */
+        .wedding-cta-row {
+            margin-top: 16px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .wedding-view-gallery-btn {
+            appearance: none;
+            background: linear-gradient(135deg, #5c1424 0%, #3e0b17 100%);
+            color: #fcf7f0;
+            border: 1.5px solid rgba(223, 199, 170, 0.55);
+            border-radius: 9999px;
+            padding: 12px 36px;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 24px rgba(18, 2, 7, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+        }
+
+        .wedding-view-gallery-btn:hover,
+        .wedding-view-gallery-btn:focus-visible {
+            transform: scale(1.04) translateY(-1px);
+            border-color: #dfc7aa;
+            background: linear-gradient(135deg, #74192e 0%, #4a0d1c 100%);
+            box-shadow: 0 12px 30px rgba(18, 2, 7, 0.8), 0 0 16px rgba(223, 199, 170, 0.35);
+        }
+
+        .wedding-view-gallery-btn:active {
+            transform: scale(0.98);
+        }
+
+        .wedding-view-gallery-btn .btn-arrow {
+            font-size: 1.25rem;
+            line-height: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .wedding-view-gallery-btn:hover .btn-arrow {
+            transform: translateX(4px);
+        }
+
+        /* Subtle corner line art flourishes */
+        .wedding-corner-flourish {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.35;
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+
+        .wedding-corner-flourish.corner-bl {
+            bottom: 0;
+            left: 0;
+            background-image: radial-gradient(circle at 0% 100%, rgba(223, 199, 170, 0.25) 0%, transparent 70%);
+        }
+
+        .wedding-corner-flourish.corner-br {
+            bottom: 0;
+            right: 0;
+            background-image: radial-gradient(circle at 100% 100%, rgba(223, 199, 170, 0.25) 0%, transparent 70%);
+        }
+
+        /* Button in topbar to open cover screen */
+        .suv-cover-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid rgba(74, 21, 33, 0.16);
+            color: #4a1521;
+            border-radius: 9999px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(74, 21, 33, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .suv-cover-toggle-btn:hover {
+            background: #fdf5f7;
+            border-color: #722234;
+            color: #722234;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="suv-guest-body">
+    <!-- 1ST PHOTO REFERENCE: LUXURY WEDDING EVENT COVER SCREEN -->
+    <section id="weddingCoverScreen" class="wedding-cover-screen">
+        <div class="wedding-cover-card">
+            <div class="wedding-cover-bg-wrap">
+                <img src="{{ cover_photo_path or '/static/img/default_wedding_cover_clean.jpg' }}" alt="Wedding Couple Cover" class="wedding-cover-img" id="weddingCoverImg">
+                <div class="wedding-cover-gradient"></div>
+            </div>
+
+            <!-- Top Header & Brand Emblem: Official 2nd Reference Logo -->
+            <div class="wedding-brand-header">
+                <a href="https://www.suvphotography.com/" target="_blank" rel="noopener noreferrer" title="Visit SUV Photography Official Website">
+                    <img src="/static/img/suv_cover_logo.png?v=20261119" alt="SUV Photography Logo" class="wedding-brand-logo-img">
+                </a>
+            </div>
+
+            <!-- Bottom Romantic Couple Details & Action -->
+            <div class="wedding-cover-content">
+                <div class="wedding-couple-script" id="coverCoupleTitle">
+                    {{ couple_title or 'Bride & Groom' }}
+                </div>
+
+                <!-- Floral Filigree Ornament -->
+                <div class="wedding-floral-ornament">
+                    <svg width="150" height="22" viewBox="0 0 170 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M85 5C85 5 79 9 79 13C79 17 85 21 85 21C85 21 91 17 91 13C91 9 85 5 85 5Z" fill="#e8c99b"/>
+                        <circle cx="85" cy="13" r="2.8" fill="#ffffff"/>
+                        <path d="M79 13C73 10 69 13 69 13C69 13 73 16 79 13Z" fill="#d4af78"/>
+                        <path d="M91 13C97 10 101 13 101 13C101 13 97 16 91 13Z" fill="#d4af78"/>
+                        <path d="M85 7C88 3 85 1 85 1C85 1 82 3 85 7Z" fill="#d4af78"/>
+                        <path d="M85 19C88 23 85 25 85 25C85 25 82 23 85 19Z" fill="#d4af78"/>
+                        <path d="M8 13H65M105 13H162" stroke="#d4af78" stroke-width="1.2" stroke-linecap="round"/>
+                        <circle cx="8" cy="13" r="2" fill="#d4af78"/>
+                        <circle cx="162" cy="13" r="2" fill="#d4af78"/>
+                    </svg>
+                </div>
+
+                <div class="wedding-date-text" id="coverEventDate">
+                    {{ event_date or '17 NOV 2026' }}
+                </div>
+
+                <div class="wedding-location-text" id="coverEventLocation">
+                    <span class="loc-dash">──</span> {{ event_location or 'CHENNAI' }} <span class="loc-dash">──</span>
+                </div>
+
+                <div class="wedding-cta-row">
+                    <button type="button" class="wedding-view-gallery-btn" id="enterGalleryBtn">
+                        <span>View Gallery</span>
+                        <span class="btn-arrow">&rarr;</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Corner Floral Flourishes -->
+            <div class="wedding-corner-flourish corner-bl"></div>
+            <div class="wedding-corner-flourish corner-br"></div>
+        </div>
+    </section>
+
+    <!-- 2ND PHOTO REFERENCE: GUEST MAIN APPLICATION (SELFIE SEARCH & RESULTS) -->
+    <div id="guestAppContainer" class="guest-app-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <!-- Topbar: Brand, Cover Return & Music Toggle -->
+        <header class="suv-topbar">
+            <a href="https://www.suvphotography.com/" target="_blank" rel="noopener noreferrer" class="suv-brand-group" title="Visit SUV Photography Official Website (https://www.suvphotography.com/)">
+                <div class="suv-brand-logo-box">
+                    <img src="/static/img/suv_monogram_black.png?v=20261119_black_v2" alt="SUV Photography Logo" class="suv-brand-logo-img">
+                </div>
+                <div class="suv-brand-info">
+                    <span class="suv-brand-name">SUV Photography</span>
+                    <span class="suv-brand-tag">Arakkonam</span>
+                </div>
+            </a>
+            <div class="suv-top-controls" style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" class="suv-cover-toggle-btn" id="openCoverBtn" title="View Event Cover">
+                    <span>👑</span>
+                    <span>Event Cover</span>
+                </button>
+                <button type="button" class="suv-icon-btn" id="musicToggleBtn" title="Play ambient event chimes" aria-label="Toggle ambient music">🎵</button>
+            </div>
+        </header>
+
+    <!-- Stepper Indicator (STEP 1 OF 2 / STEP 2 OF 2) -->
+    <div class="suv-stepper-row" id="stepperRow">
+        <div class="step-dash active" id="stepDash1"></div>
+        <div class="step-dash" id="stepDash2"></div>
+        <span class="step-label" id="stepLabel">STEP 1 OF 2</span>
+    </div>
+
+    <!-- Main Container -->
+    <main class="guest-main">
+        <!-- STEP 1: Main Welcome & Selfie Capture Card -->
+        <section class="suv-main-card" id="captureSection">
+            <div class="suv-welcome-content">
+                <h1 class="suv-welcome-title">Welcome</h1>
+
+                <!-- 1st Reference Floral Filigree Ornament Divider -->
+                <div class="suv-filigree-divider" aria-hidden="true">
+                    <svg width="130" height="20" viewBox="0 0 170 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M85 5C85 5 79 9 79 13C79 17 85 21 85 21C85 21 91 17 91 13C91 9 85 5 85 5Z" fill="#722234"/>
+                        <circle cx="85" cy="13" r="2.8" fill="#d4af78"/>
+                        <path d="M79 13C73 10 69 13 69 13C69 13 73 16 79 13Z" fill="#d4af78"/>
+                        <path d="M91 13C97 10 101 13 101 13C101 13 97 16 91 13Z" fill="#d4af78"/>
+                        <path d="M85 7C88 3 85 1 85 1C85 1 82 3 85 7Z" fill="#d4af78"/>
+                        <path d="M85 19C88 23 85 25 85 25C85 25 82 23 85 19Z" fill="#d4af78"/>
+                        <path d="M8 13H65M105 13H162" stroke="#d4af78" stroke-width="1.2" stroke-linecap="round"/>
+                        <circle cx="8" cy="13" r="2" fill="#d4af78"/>
+                        <circle cx="162" cy="13" r="2" fill="#d4af78"/>
+                    </svg>
+                </div>
+
+                <!-- Universal Celebration Quote (Weddings, Receptions, Housewarmings & Events) -->
+                <p class="suv-event-quote">
+                    &ldquo;Every celebration tells a story. Every frame holds a feeling.&rdquo;
+                </p>
+                <div class="suv-event-occasion-bar">
+                    <span>✨ Capturing precious memories across every celebration</span>
+                </div>
+            </div>
+
+            <!-- Initial Capture Options: Welcome Frame (Take a Selfie / Upload a Selfie) -->
+            <div class="capture-options" id="initialCaptureOptions">
+                <button type="button" class="btn suv-btn-primary" id="openCameraBtn">
+                    <span class="btn-icon">📷</span>
+                    <span class="btn-text">
+                        <strong>Take a Selfie</strong>
+                        <small>Use device front camera</small>
+                    </span>
+                </button>
+
+                <div class="divider"><span>OR</span></div>
+
+                <label class="btn suv-btn-secondary" for="fileInput">
+                    <span class="btn-icon">🖼️</span>
+                    <span class="btn-text">
+                        <strong>Upload a Selfie</strong>
+                        <small>Choose from photo library</small>
+                    </span>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </label>
+            </div>
+
+            <!-- Mobile native camera fallback -->
+            <input type="file" id="nativeCameraInput" accept="image/*" capture="user" style="display: none;">
+
+            <!-- Circular Preview & Live Facial Analysis State (Shown only AFTER photo is selected/captured!) -->
+            <div id="previewContainer" style="display: none; width: 100%;">
+                <!-- Circular Portal with Animated Laser Scan -->
+                <div class="scan-portal-container" id="scanPortalContainer">
+                    <img id="selfiePreview" src="" alt="Selfie Preview" class="scan-portal-img">
+                    <div class="scan-grid-overlay" id="scanGridOverlay"></div>
+                    <div class="scan-laser-line" id="scanLaserLine"></div>
+                    <div class="scan-verified-badge" id="scanVerifiedBadge" style="display: none;">✓</div>
+                </div>
+
+                <!-- Real-Time Analysis Status Row & Progress Bar -->
+                <div class="analysis-box">
+                    <div class="analysis-progress-bar-bg">
+                        <div class="analysis-progress-bar-fill" id="analysisBarFill"></div>
+                    </div>
+                    <div class="analysis-status-row">
+                        <span style="color: var(--welcome-cyan);">✨</span>
+                        <span id="analysisStatusText">Analyzing facial features...</span>
+                    </div>
+                    <div class="analysis-percent" id="analysisPercentText">0%</div>
+
+                    <div>
+                        <button type="button" class="cancel-link-btn" id="retakeBtn">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Duo / Multiple Faces Detected Box -->
+                <div id="duoDetectedBox" class="duo-box" style="display: none;">
+                    <div class="duo-header">
+                        <span class="duo-icon">💑</span>
+                        <div>
+                            <strong>Couple / Friends Detected!</strong>
+                            <p>We spotted multiple faces. Choose how to search:</p>
+                        </div>
+                    </div>
+                    <div class="face-chips" id="faceChipsContainer"></div>
+                    <div class="duo-buttons">
+                        <button type="button" class="btn btn-duo-together" id="searchTogetherBtn">
+                            💑 Photos of Us Together
+                            <small>Only photos where BOTH of you appear</small>
+                        </button>
+                        <button type="button" class="btn btn-duo-either" id="searchEitherBtn">
+                            👥 Photos of Either of Us
+                            <small>All photos containing Person 1 or Person 2</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Primary Action: Find Matches (Image 1) -->
+                <div id="singleActions" style="margin-top: 14px;">
+                    <button type="button" class="btn suv-btn-primary" id="searchBtn" aria-label="Find My Photos">
+                        Find Matches &rarr; <span style="display: none;">Find My Photos</span>
+                    </button>
+                </div>
+                <div id="duoResetAction" style="display: none; margin-top: 14px; text-align: center;">
+                    <button type="button" class="btn suv-btn-secondary" id="retakeDuoBtn">🔄 Choose Different Photo</button>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="errorBanner" class="alert alert-error" style="display: none;">
+                <span class="alert-icon">⚠️</span>
+                <span id="errorMessage">No face detected. Please try again with good lighting.</span>
+            </div>
+        </section>
+
+        <!-- STEP 2: Scanning Face Features (Radar Animation matching Image 2) -->
+        <section class="suv-main-card radar-scanning-card" id="loadingSection" style="display: none;">
+            <!-- User Selfie Banner with Green Verified Checkmark -->
+            <div class="user-photo-banner">
+                <div class="user-avatar-wrap">
+                    <img id="userBannerAvatar" src="" alt="Your Selfie" class="user-avatar-img">
+                    <div class="user-check-badge">✓</div>
+                </div>
+                <div class="user-photo-info">
+                    <span class="user-photo-title">Your photo</span>
+                    <span class="user-photo-matches" id="loadingStatusText">Scanning face embeddings...</span>
+                </div>
+            </div>
+
+            <!-- Concentric Pulsing Radar with Sparkle Icon (Image 2) -->
+            <div class="radar-wrapper">
+                <div class="radar-ring-dashed"></div>
+                <div class="radar-arc-outer"></div>
+                <div class="radar-arc-inner"></div>
+                <div class="radar-center-box">
+                    <span>✨</span>
+                </div>
+            </div>
+
+            <h3 class="radar-title">Scanning Face Features</h3>
+            <p class="radar-desc">Matching facial embeddings across the photo collection...</p>
+        </section>
+
+        <!-- STEP 2 Results: Matching Photos Grid -->
+        <section id="resultsSection" style="display: none; width: 100%;">
+            <!-- Header Bar -->
+            <div class="results-topbar">
+                <button type="button" class="results-back-btn" id="resultsBackBtn">
+                    <span>&larr;</span> Back
+                </button>
+                <div class="results-title-group" style="text-align: right;">
+                    <h2 id="resultsCount">AI Photo Results</h2>
+                    <span id="resultsSubtitle">Matching Photos</span>
+                </div>
+            </div>
+
+            <!-- User Selfie Banner with Verified Badge (Image 2) -->
+            <div class="user-photo-banner">
+                <div class="user-avatar-wrap">
+                    <img id="userBannerAvatarResults" src="" alt="Your Selfie" class="user-avatar-img">
+                    <div class="user-check-badge">✓</div>
+                </div>
+                <div class="user-photo-info">
+                    <span class="user-photo-title">Your photo</span>
+                    <span class="user-photo-matches" id="userMatchesCountText">0 matches found</span>
+                </div>
+                <div style="margin-left: auto;">
+                    <button type="button" class="btn-download-all" id="downloadZipBtn">
+                        &darr; All
+                    </button>
+                </div>
+            </div>
+
+            <div id="noteBanner" class="alert alert-info" style="display: none;"></div>
+
+            <!-- Photo Grid -->
+            <div id="photoGrid" class="photo-grid"></div>
+
+            <div style="text-align: center; margin-top: 18px;">
+                <button type="button" class="btn suv-btn-secondary" id="newSearchBtn">
+                    🔄 Search with Another Selfie
+                </button>
+            </div>
+        </section>
+
+        <!-- No Results Found -->
+        <section class="suv-main-card empty-card" id="noResultsSection" style="display: none;">
+            <div class="empty-icon-wrap">🔍</div>
+            <h3>No Matches Found</h3>
+            <p>We couldn't find any photos matching your selfie. This could be because:</p>
+            <ul>
+                <li>The lighting or angle in the selfie was very different from event photos.</li>
+                <li>Event photos are still being uploaded and synced.</li>
+                <li>Your face was obscured by sunglasses or a hat.</li>
+            </ul>
+            <button type="button" class="btn suv-btn-primary" id="tryAgainBtn">Try Another Selfie</button>
+        </section>
+
+        <!-- Footer -->
+        <footer class="suv-guest-footer">
+            <p>Brought to you by <a href="https://www.suvphotography.com/" target="_blank" rel="noopener noreferrer" class="suv-footer-link" title="Visit SUV Photography Official Website">SUV Photography Arakkonam</a></p>
+        </footer>
+    </main>
+
+    <!-- Camera Modal (Live WebRTC stream) -->
+    <div id="cameraModal" class="modal-overlay" style="display: none;">
+        <div class="camera-modal">
+            <div class="camera-header">
+                <h3>Take a Selfie</h3>
+                <button type="button" class="close-btn" id="closeCameraBtn">&times;</button>
+            </div>
+            <div class="camera-feed-container">
+                <video id="cameraVideo" autoplay playsinline muted></video>
+                <div class="scan-laser-line"></div>
+                <canvas id="captureCanvas" style="display: none;"></canvas>
+            </div>
+            <div class="camera-footer">
+                <button type="button" class="btn btn-capture" id="snapPhotoBtn">📸 Capture</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Lightbox Modal -->
+    <div id="lightboxModal" class="lightbox-overlay" style="display: none;">
+        <button type="button" class="lightbox-close" id="closeLightboxBtn">&times;</button>
+        <div class="lightbox-content">
+            <img id="lightboxImg" src="" alt="Event Photo">
+            <div class="lightbox-bar">
+                <span id="lightboxFilename" class="lightbox-filename"></span>
+                <a id="lightboxDownloadBtn" href="#" download class="btn suv-btn-primary" style="width: auto; padding: 10px 18px; font-size: 0.88rem;">⬇️ Download High-Res</a>
+            </div>
+        </div>
+    </div>
+    </div> <!-- /#guestAppContainer -->
+
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Dynamic hydration of event settings (supports static Vercel hosting + live backend updates)
+    fetch("/api/event").then(res => res.json()).then(data => {
+        if (data) {
+            if (data.couple_title) {
+                const el = document.getElementById("coverCoupleTitle");
+                if (el) el.textContent = data.couple_title;
+            }
+            if (data.event_date) {
+                const el = document.getElementById("coverEventDate");
+                if (el) el.textContent = data.event_date;
+            }
+            if (data.event_location) {
+                const el = document.getElementById("coverEventLocation");
+                if (el) el.innerHTML = `<span class="loc-dash">──</span> ${data.event_location} <span class="loc-dash">──</span>`;
+            }
+            if (data.cover_photo_path) {
+                const el = document.getElementById("weddingCoverImg");
+                if (el) el.src = data.cover_photo_path;
+            }
+            if (data.event_name) {
+                document.title = `${data.event_name} - SUV Photography Arakkonam`;
+            }
+        }
+    }).catch(() => {});
+
+    // Cover Screen transition handling
+    const weddingCoverScreen = document.getElementById("weddingCoverScreen");
+    const enterGalleryBtn = document.getElementById("enterGalleryBtn");
+    const openCoverBtn = document.getElementById("openCoverBtn");
+
+    if (enterGalleryBtn && weddingCoverScreen) {
+        enterGalleryBtn.addEventListener("click", () => {
+            weddingCoverScreen.classList.add("cover-dismissed");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    if (openCoverBtn && weddingCoverScreen) {
+        openCoverBtn.addEventListener("click", () => {
+            weddingCoverScreen.classList.remove("cover-dismissed");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+    // Stepper elements
+    const stepDash1 = document.getElementById("stepDash1");
+    const stepDash2 = document.getElementById("stepDash2");
+    const stepLabel = document.getElementById("stepLabel");
+
+    // Section containers
+    const captureSection = document.getElementById("captureSection");
+    const initialCaptureOptions = document.getElementById("initialCaptureOptions");
+    const previewContainer = document.getElementById("previewContainer");
+    const selfiePreview = document.getElementById("selfiePreview");
+    const openCameraBtn = document.getElementById("openCameraBtn");
+    const fileInput = document.getElementById("fileInput");
+    const nativeCameraInput = document.getElementById("nativeCameraInput");
+    const retakeBtn = document.getElementById("retakeBtn");
+    const searchBtn = document.getElementById("searchBtn");
+    const errorBanner = document.getElementById("errorBanner");
+    const errorMessage = document.getElementById("errorMessage");
+
+    // Real-time Facial Analysis Elements
+    const analysisBarFill = document.getElementById("analysisBarFill");
+    const analysisStatusText = document.getElementById("analysisStatusText");
+    const analysisPercentText = document.getElementById("analysisPercentText");
+
+    // Duo / Multiple Faces Elements
+    const duoDetectedBox = document.getElementById("duoDetectedBox");
+    const faceChipsContainer = document.getElementById("faceChipsContainer");
+    const searchTogetherBtn = document.getElementById("searchTogetherBtn");
+    const searchEitherBtn = document.getElementById("searchEitherBtn");
+    const singleActions = document.getElementById("singleActions");
+    const duoResetAction = document.getElementById("duoResetAction");
+    const retakeDuoBtn = document.getElementById("retakeDuoBtn");
+
+    // Step 2 Loading (Radar Animation) Elements
+    const loadingSection = document.getElementById("loadingSection");
+    const userBannerAvatar = document.getElementById("userBannerAvatar");
+    const loadingStatusText = document.getElementById("loadingStatusText");
+
+    // Step 2 Results Elements
+    const resultsSection = document.getElementById("resultsSection");
+    const resultsBackBtn = document.getElementById("resultsBackBtn");
+    const resultsCount = document.getElementById("resultsCount");
+    const resultsSubtitle = document.getElementById("resultsSubtitle");
+    const userBannerAvatarResults = document.getElementById("userBannerAvatarResults");
+    const userMatchesCountText = document.getElementById("userMatchesCountText");
+    const photoGrid = document.getElementById("photoGrid");
+    const noteBanner = document.getElementById("noteBanner");
+    const downloadZipBtn = document.getElementById("downloadZipBtn");
+    const newSearchBtn = document.getElementById("newSearchBtn");
+
+    // No Results Section
+    const noResultsSection = document.getElementById("noResultsSection");
+    const tryAgainBtn = document.getElementById("tryAgainBtn");
+
+    // Live Camera Stream Modal
+    const cameraModal = document.getElementById("cameraModal");
+    const cameraVideo = document.getElementById("cameraVideo");
+    const captureCanvas = document.getElementById("captureCanvas");
+    const snapPhotoBtn = document.getElementById("snapPhotoBtn");
+    const closeCameraBtn = document.getElementById("closeCameraBtn");
+
+    // Lightbox Modal
+    const lightboxModal = document.getElementById("lightboxModal");
+    const lightboxImg = document.getElementById("lightboxImg");
+    const lightboxFilename = document.getElementById("lightboxFilename");
+    const lightboxDownloadBtn = document.getElementById("lightboxDownloadBtn");
+    const closeLightboxBtn = document.getElementById("closeLightboxBtn");
+
+    // Internal State
+    let selectedImageBlob = null;
+    let currentMatchedPhotoIds = [];
+    let mediaStream = null;
+    let detectedFacesData = [];
+    let analysisTimer = null;
+
+    function showError(msg) {
+        if (errorMessage) errorMessage.textContent = msg;
+        if (errorBanner) errorBanner.style.display = "flex";
+    }
+
+    function clearError() {
+        if (errorBanner) errorBanner.style.display = "none";
+    }
+
+    // Fast client-side image compression
+    function compressImageIfNeeded(file, maxDim = 1280) {
+        return new Promise((resolve) => {
+            if (!file || !file.type || !file.type.startsWith("image/")) {
+                resolve(file);
+                return;
+            }
+            if (file.size < 400 * 1024) {
+                resolve(file);
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width;
+                    let h = img.height;
+                    const max = Math.max(w, h);
+                    if (max > maxDim) {
+                        const s = maxDim / max;
+                        w = Math.round(w * s);
+                        h = Math.round(h * s);
+                    }
+                    const canvas = document.createElement("canvas");
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, w, h);
+                    canvas.toBlob((blob) => {
+                        resolve(blob || file);
+                    }, "image/jpeg", 0.88);
+                };
+                img.onerror = () => resolve(file);
+                img.src = e.target.result;
+            };
+            reader.onerror = () => resolve(file);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // High-speed, smooth sequential facial feature analysis animation:
+    // Completes 0% -> 100% in 500ms, then STOPS the laser scan!
+    function runFastAnalysisAnimation() {
+        if (analysisTimer) clearInterval(analysisTimer);
+        if (analysisBarFill) {
+            analysisBarFill.style.width = "0%";
+            analysisBarFill.style.background = "linear-gradient(90deg, #722234, #a52744, #722234)";
+        }
+        if (analysisPercentText) analysisPercentText.textContent = "0%";
+        if (analysisStatusText) analysisStatusText.textContent = "Analyzing facial features...";
+
+        const scanLaser = document.getElementById("scanLaserLine");
+        const scanGrid = document.getElementById("scanGridOverlay");
+        const scanPortal = document.getElementById("scanPortalContainer");
+        const scanBadge = document.getElementById("scanVerifiedBadge");
+        if (scanLaser) scanLaser.style.display = "block";
+        if (scanGrid) scanGrid.style.display = "block";
+        if (scanPortal) scanPortal.classList.remove("scanned");
+        if (scanBadge) scanBadge.style.display = "none";
+
+        // Button is immediately enabled so user never waits!
+        if (searchBtn) {
+            searchBtn.disabled = false;
+        }
+
+        const startTime = Date.now();
+        const duration = 500; // 500ms total smooth progression
+
+        analysisTimer = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(100, Math.round((elapsed / duration) * 100));
+
+            if (progress < 40) {
+                if (analysisStatusText) analysisStatusText.textContent = "Analyzing facial features...";
+            } else if (progress < 85) {
+                if (analysisStatusText) analysisStatusText.textContent = "Validating face quality...";
+            } else if (progress >= 100) {
+                if (analysisStatusText) analysisStatusText.textContent = "Almost ready, face detected! ✅";
+                if (analysisBarFill) analysisBarFill.style.width = "100%";
+                if (analysisPercentText) analysisPercentText.textContent = "100%";
+
+                // STOP scanning: laser line and grid overlay stop completely
+                if (scanLaser) scanLaser.style.display = "none";
+                if (scanGrid) scanGrid.style.display = "none";
+                if (scanPortal) scanPortal.classList.add("scanned");
+                if (scanBadge) scanBadge.style.display = "flex";
+
+                clearInterval(analysisTimer);
+                analysisTimer = null;
+                return;
+            } else {
+                if (analysisStatusText) analysisStatusText.textContent = "Almost ready, face detected! ✅";
+            }
+
+            if (analysisBarFill) analysisBarFill.style.width = `${progress}%`;
+            if (analysisPercentText) analysisPercentText.textContent = `${progress}%`;
+        }, 18);
+    }
+
+    async function setPreview(blob) {
+        selectedImageBlob = blob;
+        const previewUrl = URL.createObjectURL(blob);
+        selfiePreview.src = previewUrl;
+        if (userBannerAvatar) userBannerAvatar.src = previewUrl;
+        if (userBannerAvatarResults) userBannerAvatarResults.src = previewUrl;
+
+        if (initialCaptureOptions) initialCaptureOptions.style.display = "none";
+        previewContainer.style.display = "block";
+        clearError();
+
+        // Reset Duo elements
+        if (duoDetectedBox) duoDetectedBox.style.display = "none";
+        if (duoResetAction) duoResetAction.style.display = "none";
+        if (singleActions) singleActions.style.display = "block";
+
+        // Set stepper to Step 1
+        if (stepDash1) stepDash1.classList.add("active");
+        if (stepDash2) stepDash2.classList.remove("active");
+        if (stepLabel) stepLabel.textContent = "STEP 1 OF 2";
+
+        // Enable Find Matches IMMEDIATELY
+        if (searchBtn) searchBtn.disabled = false;
+
+        // Run fast visual analysis (0 to 100% in 500ms)
+        runFastAnalysisAnimation();
+
+        // Background check for Duo (Couple / Friends)
+        const formData = new FormData();
+        formData.append("file", blob, "preview.jpg");
+
+        fetch("/api/guest/detect-faces", {
+            method: "POST",
+            body: formData
+        }).then(res => res.json()).then(data => {
+            if (data && data.success && data.faces && data.faces.length >= 2) {
+                detectedFacesData = data.faces;
+                if (singleActions) singleActions.style.display = "none";
+                if (duoResetAction) duoResetAction.style.display = "block";
+                if (duoDetectedBox) {
+                    duoDetectedBox.style.display = "block";
+                    renderFaceChips(data.faces);
+                }
+            }
+        }).catch(err => {
+            console.warn("Background face detection error:", err);
+        });
+    }
+
+    function renderFaceChips(faces) {
+        if (!faceChipsContainer) return;
+        faceChipsContainer.innerHTML = "";
+
+        faces.forEach((f, idx) => {
+            const chip = document.createElement("div");
+            chip.className = "face-chip";
+            chip.title = `Search only for Person ${idx + 1}`;
+            chip.innerHTML = `
+                ${f.avatar_b64 ? `<img src="${f.avatar_b64}" alt="Face ${idx + 1}" class="face-chip-avatar">` : ""}
+                <span class="face-chip-label">Person ${idx + 1}</span>
+            `;
+            chip.addEventListener("click", () => {
+                executeSearch("single", f.index);
+            });
+            faceChipsContainer.appendChild(chip);
+        });
+    }
+
+    function resetToCapture() {
+        if (analysisTimer) clearInterval(analysisTimer);
+        selectedImageBlob = null;
+        detectedFacesData = [];
+        const guestMain = document.querySelector(".guest-main");
+        if (guestMain) guestMain.classList.remove("has-results");
+        document.body.classList.remove("results-mode");
+        if (fileInput) fileInput.value = "";
+        if (nativeCameraInput) nativeCameraInput.value = "";
+        if (initialCaptureOptions) initialCaptureOptions.style.display = "flex";
+        if (previewContainer) previewContainer.style.display = "none";
+        if (resultsSection) resultsSection.style.display = "none";
+        if (noResultsSection) noResultsSection.style.display = "none";
+        if (loadingSection) loadingSection.style.display = "none";
+        if (captureSection) captureSection.style.display = "block";
+        if (duoDetectedBox) duoDetectedBox.style.display = "none";
+        if (singleActions) singleActions.style.display = "block";
+        if (duoResetAction) duoResetAction.style.display = "none";
+
+        if (stepDash1) stepDash1.classList.add("active");
+        if (stepDash2) stepDash2.classList.remove("active");
+        if (stepLabel) stepLabel.textContent = "STEP 1 OF 2";
+
+        const scanLaser = document.getElementById("scanLaserLine");
+        const scanGrid = document.getElementById("scanGridOverlay");
+        const scanPortal = document.getElementById("scanPortalContainer");
+        const scanBadge = document.getElementById("scanVerifiedBadge");
+        if (scanLaser) scanLaser.style.display = "block";
+        if (scanGrid) scanGrid.style.display = "block";
+        if (scanPortal) scanPortal.classList.remove("scanned");
+        if (scanBadge) scanBadge.style.display = "none";
+
+        if (analysisBarFill) {
+            analysisBarFill.style.width = "0%";
+            analysisBarFill.style.background = "linear-gradient(90deg, #722234, #a52744, #722234)";
+        }
+        if (analysisPercentText) analysisPercentText.textContent = "0%";
+        if (analysisStatusText) analysisStatusText.textContent = "Analyzing facial features...";
+
+        clearError();
+    }
+
+    // Camera Handling (Live WebRTC stream)
+    async function startCamera() {
+        clearError();
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: "user",
+                        width: { ideal: 720 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+                cameraVideo.srcObject = mediaStream;
+                cameraModal.style.display = "flex";
+            } catch (err) {
+                console.warn("Direct webcam access failed, falling back to native file camera:", err);
+                nativeCameraInput.click();
+            }
+        } else {
+            nativeCameraInput.click();
+        }
+    }
+
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        cameraModal.style.display = "none";
+    }
+
+    if (snapPhotoBtn) {
+        snapPhotoBtn.addEventListener("click", () => {
+            const w = cameraVideo.videoWidth || 640;
+            const h = cameraVideo.videoHeight || 480;
+            captureCanvas.width = w;
+            captureCanvas.height = h;
+
+            const ctx = captureCanvas.getContext("2d");
+            ctx.translate(w, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(cameraVideo, 0, 0, w, h);
+
+            captureCanvas.toBlob((blob) => {
+                stopCamera();
+                if (blob) {
+                    setPreview(blob);
+                }
+            }, "image/jpeg", 0.90);
+        });
+    }
+
+    if (openCameraBtn) openCameraBtn.addEventListener("click", startCamera);
+    if (closeCameraBtn) closeCameraBtn.addEventListener("click", stopCamera);
+
+    async function handleSelectedFile(file) {
+        if (!file) return;
+        const optimizedBlob = await compressImageIfNeeded(file, 1280);
+        setPreview(optimizedBlob);
+    }
+
+    if (nativeCameraInput) {
+        nativeCameraInput.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleSelectedFile(e.target.files[0]);
+            }
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleSelectedFile(e.target.files[0]);
+            }
+        });
+    }
+
+    if (retakeBtn) retakeBtn.addEventListener("click", resetToCapture);
+    if (retakeDuoBtn) retakeDuoBtn.addEventListener("click", resetToCapture);
+    if (tryAgainBtn) tryAgainBtn.addEventListener("click", resetToCapture);
+    if (newSearchBtn) newSearchBtn.addEventListener("click", resetToCapture);
+
+    // Step 2 Back Button returns to Step 1 capture
+    if (resultsBackBtn) {
+        resultsBackBtn.addEventListener("click", () => {
+            resultsSection.style.display = "none";
+            noResultsSection.style.display = "none";
+            loadingSection.style.display = "none";
+            captureSection.style.display = "block";
+            if (stepDash1) stepDash1.classList.add("active");
+            if (stepDash2) stepDash2.classList.remove("active");
+            if (stepLabel) stepLabel.textContent = "STEP 1 OF 2";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    // Search Execution (Step 2)
+    async function executeSearch(mode = "single", faceIndex = null) {
+        if (!selectedImageBlob) {
+            showError("Please select or take a selfie first.");
+            return;
+        }
+
+        clearError();
+
+        // Switch Stepper to STEP 2 OF 2
+        if (stepDash1) stepDash1.classList.add("active");
+        if (stepDash2) stepDash2.classList.add("active");
+        if (stepLabel) stepLabel.textContent = "STEP 2 OF 2";
+
+        // Show concentric radar animation
+        captureSection.style.display = "none";
+        resultsSection.style.display = "none";
+        noResultsSection.style.display = "none";
+        loadingSection.style.display = "block";
+
+        if (mode === "together") {
+            loadingStatusText.textContent = "Finding photos where BOTH of you appear together...";
+        } else if (mode === "either") {
+            loadingStatusText.textContent = "Finding photos with either of you...";
+        } else {
+            loadingStatusText.textContent = "Matching facial embeddings across the collection...";
+        }
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        const formData = new FormData();
+        formData.append("file", selectedImageBlob, "selfie.jpg");
+        formData.append("mode", mode);
+        if (faceIndex !== null) {
+            formData.append("face_index", faceIndex.toString());
+        }
+
+        try {
+            const res = await fetch("/api/guest/search", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await res.json();
+            loadingSection.style.display = "none";
+
+            if (!res.ok || !data.success) {
+                captureSection.style.display = "block";
+                if (stepDash2) stepDash2.classList.remove("active");
+                if (stepLabel) stepLabel.textContent = "STEP 1 OF 2";
+                showError(data.error || "Search failed. Please try again.");
+                return;
+            }
+
+            if (data.count === 0) {
+                noResultsSection.style.display = "block";
+                return;
+            }
+
+            // Display results
+            currentMatchedPhotoIds = data.photos.map(p => p.id);
+            resultsCount.textContent = "AI Photo Results";
+            resultsSubtitle.textContent = `${data.count} photo${data.count === 1 ? '' : 's'} matched`;
+            userMatchesCountText.textContent = `${data.count} matches found`;
+
+            if (data.note) {
+                noteBanner.textContent = data.note;
+                noteBanner.style.display = "flex";
+            } else {
+                noteBanner.style.display = "none";
+            }
+
+            renderPhotoGrid(data.photos);
+            const guestMain = document.querySelector(".guest-main");
+            if (guestMain) guestMain.classList.add("has-results");
+            document.body.classList.add("results-mode");
+            resultsSection.style.display = "block";
+
+        } catch (err) {
+            console.error("Search error:", err);
+            loadingSection.style.display = "none";
+            captureSection.style.display = "block";
+            if (stepDash2) stepDash2.classList.remove("active");
+            if (stepLabel) stepLabel.textContent = "STEP 1 OF 2";
+            showError("Network or server error while searching photos. Please try again.");
+        }
+    }
+
+    if (searchBtn) {
+        searchBtn.addEventListener("click", () => executeSearch("single"));
+    }
+
+    if (searchTogetherBtn) {
+        searchTogetherBtn.addEventListener("click", () => executeSearch("together"));
+    }
+
+    if (searchEitherBtn) {
+        searchEitherBtn.addEventListener("click", () => executeSearch("either"));
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function renderPhotoGrid(photos) {
+        photoGrid.innerHTML = "";
+        photos.forEach(photo => {
+            const card = document.createElement("div");
+            card.className = "photo-card";
+            const safeName = escapeHtml(photo.filename);
+            const thumbUrl = photo.thumbnail_url || photo.url;
+            const previewUrl = photo.preview_url || photo.url;
+            const downloadUrl = photo.download_url || (photo.url.includes("?") ? `${photo.url}&download=true` : `${photo.url}?download=true`);
+
+            card.innerHTML = `
+                <div class="photo-img-wrapper" data-full-url="${previewUrl}" data-filename="${safeName}">
+                    <img src="${thumbUrl}" alt="${safeName}" loading="eager" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.retried){this.dataset.retried=1;this.src='/api/thumbnails/${photo.id}?proxy=true';}else{this.onerror=null;}">
+                    <span class="score-badge">Match: ${photo.score}</span>
+                </div>
+                <a href="${downloadUrl}" class="download-icon-btn" download="${safeName}" title="Download high resolution photo" onclick="event.stopPropagation();">
+                    ⬇️
+                </a>
+            `;
+
+            card.querySelector(".photo-img-wrapper").addEventListener("click", () => {
+                openLightbox(previewUrl, photo.filename, downloadUrl);
+            });
+
+            photoGrid.appendChild(card);
+        });
+    }
+
+    // Lightbox Modal
+    function openLightbox(url, filename, downloadUrl = null) {
+        lightboxImg.src = url;
+        lightboxFilename.textContent = filename;
+        const dl = downloadUrl || (url.includes("?") ? `${url}&download=true` : `${url}?download=true`);
+        lightboxDownloadBtn.href = dl;
+        lightboxDownloadBtn.setAttribute("download", filename);
+        lightboxModal.style.display = "flex";
+    }
+
+    if (closeLightboxBtn) {
+        closeLightboxBtn.addEventListener("click", () => {
+            lightboxModal.style.display = "none";
+            lightboxImg.src = "";
+        });
+    }
+
+    if (lightboxModal) {
+        lightboxModal.addEventListener("click", (e) => {
+            if (e.target === lightboxModal) {
+                lightboxModal.style.display = "none";
+                lightboxImg.src = "";
+            }
+        });
+    }
+
+    // Download All ZIP
+    if (downloadZipBtn) {
+        downloadZipBtn.addEventListener("click", async () => {
+            if (!currentMatchedPhotoIds.length) return;
+
+            downloadZipBtn.disabled = true;
+            downloadZipBtn.textContent = "⏳ Zipping...";
+
+            try {
+                const res = await fetch("/api/guest/download-zip", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ photo_ids: currentMatchedPhotoIds })
+                });
+
+                if (!res.ok) throw new Error("ZIP creation failed");
+
+                const blob = await res.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = downloadUrl;
+                a.download = "suv_event_photos.zip";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+            } catch (err) {
+                alert("Failed to download ZIP: " + err.message);
+            } finally {
+                downloadZipBtn.disabled = false;
+                downloadZipBtn.textContent = "⬇️ All";
+            }
+        });
+    }
+});
+    </script>
+    <script>
+        // Ambient Event Chimes (Web Audio API)
+        (function() {
+            let audioCtx = null;
+            let isPlaying = false;
+            let timer = null;
+            const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+
+            function playChime(freq, dur = 1.8) {
+                try {
+                    if (!audioCtx) {
+                        const AC = window.AudioContext || window.webkitAudioContext;
+                        audioCtx = new AC();
+                    }
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now);
+                    gain.gain.setValueAtTime(0.001, now);
+                    gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + dur);
+                } catch(e) {}
+            }
+
+            const btn = document.getElementById('musicToggleBtn');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    if (isPlaying) {
+                        isPlaying = false;
+                        if (timer) clearInterval(timer);
+                        btn.classList.remove('playing');
+                    } else {
+                        isPlaying = true;
+                        btn.classList.add('playing');
+                        playChime(notes[0], 2.2);
+                        setTimeout(() => playChime(notes[2], 2.0), 300);
+                        setTimeout(() => playChime(notes[3], 2.5), 600);
+                        let s = 0;
+                        timer = setInterval(() => {
+                            if (!isPlaying) return;
+                            playChime(notes[s % notes.length], 2.2);
+                            setTimeout(() => playChime(notes[(s + 2) % notes.length], 2.0), 350);
+                            s = (s + 1) % notes.length;
+                        }, 3200);
+                    }
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

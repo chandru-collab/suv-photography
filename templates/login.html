@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Host Login - Event Photo Sharing</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon" style="background: transparent; display: flex; align-items: center; justify-content: center;">
+                <img src="/static/img/suv_badge.png" alt="SUV Photography Logo" style="width: 54px; height: 54px; border-radius: 14px; object-fit: contain;">
+            </div>
+            <h2>SUV Photography Arakkonam</h2>
+            <p>Host Dashboard &bull; Enter password to manage event photos</p>
+        </div>
+
+        <form id="loginForm" class="login-form">
+            <div class="form-group">
+                <label for="password">Host Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter host password" required autofocus>
+            </div>
+            <div id="loginError" class="alert-error" style="display: none;"></div>
+            <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Log In</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("loginBtn");
+            const errBox = document.getElementById("loginError");
+            errBox.style.display = "none";
+            btn.disabled = true;
+            btn.textContent = "Logging in...";
+
+            const formData = new FormData();
+            formData.append("password", document.getElementById("password").value);
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    window.location.href = data.redirect || "/dashboard";
+                } else {
+                    errBox.textContent = data.error || "Invalid password";
+                    errBox.style.display = "block";
+                    btn.disabled = false;
+                    btn.textContent = "Log In";
+                }
+            } catch (err) {
+                errBox.textContent = "Failed to connect to server.";
+                errBox.style.display = "block";
+                btn.disabled = false;
+                btn.textContent = "Log In";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+.env
+
+# Runtime data (except keep dir structure)
+data/*.db
+data/events.db
+data/google_credentials.json
+data/photos/*
+data/thumbnails/*
+data/drive_downloads/*
+data/temp_uploads/*
+!data/photos/.gitkeep
+!data/thumbnails/.gitkeep
+!data/qr/.gitkeep
+
+# Sensitive Google Cloud Service Account credentials (DO NOT COMMIT)
+suv-photography-*.json
+*credentials*.json
+
+# Deployment caches & local build artifacts
+.vercel/
+.render/
+.DS_Store
+Thumbs.db
