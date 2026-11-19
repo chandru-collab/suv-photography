@@ -20,7 +20,7 @@ from googleapiclient.http import MediaIoBaseDownload
 # pyrefly: ignore[missing-import]
 from googleapiclient.errors import HttpError
 
-from backend.config import BASE_DIR
+from backend.config import BASE_DIR, DATA_DIR
 
 logger = logging.getLogger("drive_service")
 
@@ -52,25 +52,43 @@ FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
 
 def find_credentials_file() -> Optional[Path]:
     """Locate the Google Cloud Service Account JSON credentials file."""
-    # 1. Environment variable
+    # 0. Check raw JSON string in environment variable (Render / Cloud deployment)
+    raw_json = (os.environ.get("GOOGLE_CREDENTIALS_JSON") or "").strip()
+    if raw_json:
+        creds_target = DATA_DIR / "google_credentials.json"
+        try:
+            data = json.loads(raw_json)
+            if data.get("type") == "service_account":
+                creds_target.write_text(raw_json, encoding="utf-8")
+                return creds_target
+        except Exception as e:
+            logger.warning(f"Invalid GOOGLE_CREDENTIALS_JSON environment variable: {e}")
+
+    # 1. Environment variable path
     env_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     if env_path and Path(env_path).exists():
         return Path(env_path)
 
-    # 2. Preferred specific credentials file
+    # 2. Render secret file locations
+    for secret_path in [Path("/etc/secrets/google-credentials.json"), Path("/etc/secrets/suv-photography-514705-7a2bae36b793.json")]:
+        if secret_path.exists():
+            return secret_path
+
+    # 3. Preferred specific credentials file
     preferred = BASE_DIR / "suv-photography-514705-7a2bae36b793.json"
     if preferred.exists():
         return preferred
 
-    # 3. Any service account JSON in BASE_DIR
-    for json_file in BASE_DIR.glob("*.json"):
-        try:
-            with open(json_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                if data.get("type") == "service_account" and "private_key" in data:
-                    return json_file
-        except Exception:
-            continue
+    # 4. Any service account JSON in BASE_DIR or DATA_DIR
+    for d in [BASE_DIR, DATA_DIR]:
+        for json_file in d.glob("*.json"):
+            try:
+                with open(json_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if data.get("type") == "service_account" and "private_key" in data:
+                        return json_file
+            except Exception:
+                continue
 
     return None
 
@@ -127,7 +145,13 @@ class GoogleDriveManager:
             else:
                 self._initialize_service()
 
-        return getattr(self._local, "service", self._service)
+        svc = getattr(self._local, "service", self._service)
+        if svc is None:
+            raise RuntimeError(
+                "Google Drive service is not configured. "
+                "Please add 'GOOGLE_CREDENTIALS_JSON' in Render Environment Variables with your Service Account JSON."
+            )
+        return svc
 
     def get_access_token(self) -> Optional[str]:
         """Obtain a valid OAuth2 access token for direct authenticated video and media streaming."""

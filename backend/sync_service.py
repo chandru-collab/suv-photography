@@ -321,6 +321,14 @@ def run_drive_sync(folder_link_or_id: str, reindex: bool = True):
 
         log_id = start_sync_log(f"Syncing Google Drive folder ID: {folder_id}")
 
+        if not drive_manager.is_configured:
+            err_msg = "Google Drive credentials not configured on server. Please add 'GOOGLE_CREDENTIALS_JSON' in Render Environment Variables."
+            sync_status["current_action"] = f"Drive sync failed: {err_msg}"
+            sync_status["error"] = err_msg
+            sync_status["progress_percent"] = 0
+            finish_sync_log(log_id, "FAILED", err_msg, 0, 0, 0, 0)
+            return
+
         try:
             folder_meta = drive_manager.get_folder_metadata(folder_id)
             folder_name = folder_meta.get("name", "Event Folder")
