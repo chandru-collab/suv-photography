@@ -240,6 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (data.error) {
                         showSyncResult("error", data.error);
+                    } else if (data.total_found === 0) {
+                        showSyncResult("warning", data.current_action || "No photos found. Please make sure the folder is shared with: suv-photography@suv-photography-514705.iam.gserviceaccount.com");
                     } else {
                         showSyncResult("success", `Sync complete! ${data.photos_added} new photos added (${data.faces_detected} faces detected), ${data.photos_skipped} existing photos skipped.`);
                     }

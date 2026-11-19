@@ -42,7 +42,7 @@ from backend.drive_service import (
 logger = logging.getLogger("sync_service")
 
 # Supported image extensions
-VALID_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
+VALID_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".heic", ".heif", ".tiff", ".tif", ".cr2", ".nef", ".arw", ".dng"}
 
 # Cancellation event for stopping running syncs immediately
 _sync_cancel_event = threading.Event()
@@ -248,42 +248,59 @@ def process_drive_image_in_memory(
         logger.error(f"Error processing Drive image {filename} ({file_id}): {e}")
         return False, 0
 
-def fetch_all_drive_image_items(folder_id: str, max_depth: int = 2, current_depth: int = 0) -> List[Dict[str, Any]]:
+def fetch_all_drive_image_items(folder_id: str, max_depth: int = 10, current_depth: int = 0) -> List[Dict[str, Any]]:
     """Recursively collect image items from Google Drive folder structure using Drive API."""
     items = []
-    try:
-        q = f"'{folder_id}' in parents and trashed = false"
-        page_token = None
+    q = f"'{folder_id}' in parents and trashed = false"
+    page_token = None
 
-        while True:
-            if _sync_cancel_event.is_set():
-                break
+    while True:
+        if _sync_cancel_event.is_set():
+            break
 
+        try:
             res = drive_manager.service.files().list(
                 q=q,
                 pageSize=100,
                 pageToken=page_token,
-                fields="nextPageToken, files(id, name, mimeType, size, modifiedTime, thumbnailLink, imageMediaMetadata)",
+                fields="nextPageToken, files(id, name, mimeType, size, modifiedTime, thumbnailLink, imageMediaMetadata, shortcutDetails)",
                 supportsAllDrives=True,
                 includeItemsFromAllDrives=True
             ).execute()
+        except Exception as e:
+            logger.error(f"Failed to fetch Drive items for folder {folder_id}: {e}")
+            raise RuntimeError(f"Error accessing Google Drive folder {folder_id}: {e}")
 
-            for f in res.get("files", []):
-                mime = f.get("mimeType", "")
-                ext = Path(f.get("name", "")).suffix.lower()
-                if mime in IMAGE_MIME_TYPES or mime.startswith("image/") or ext in VALID_EXTENSIONS:
-                    f["parent_folder_id"] = folder_id
-                    items.append(f)
-                elif mime == FOLDER_MIME_TYPE and current_depth < max_depth:
-                    sub_items = fetch_all_drive_image_items(f["id"], max_depth=max_depth, current_depth=current_depth + 1)
-                    items.extend(sub_items)
+        for f in res.get("files", []):
+            mime = f.get("mimeType", "")
+            ext = Path(f.get("name", "")).suffix.lower()
 
-            page_token = res.get("nextPageToken")
-            if not page_token or _sync_cancel_event.is_set():
-                break
+            # Handle Shortcuts
+            if mime == "application/vnd.google-apps.shortcut":
+                shortcut = f.get("shortcutDetails", {})
+                target_id = shortcut.get("targetId")
+                target_mime = shortcut.get("targetMimeType", "")
+                if target_id:
+                    if target_mime == FOLDER_MIME_TYPE and current_depth < max_depth:
+                        sub_items = fetch_all_drive_image_items(target_id, max_depth=max_depth, current_depth=current_depth + 1)
+                        items.extend(sub_items)
+                    elif target_mime in IMAGE_MIME_TYPES or target_mime.startswith("image/") or ext in VALID_EXTENSIONS:
+                        f["id"] = target_id
+                        f["mimeType"] = target_mime
+                        f["parent_folder_id"] = folder_id
+                        items.append(f)
+                continue
 
-    except Exception as e:
-        logger.error(f"Failed to fetch Drive items for folder {folder_id}: {e}")
+            if mime in IMAGE_MIME_TYPES or mime.startswith("image/") or ext in VALID_EXTENSIONS:
+                f["parent_folder_id"] = folder_id
+                items.append(f)
+            elif mime == FOLDER_MIME_TYPE and current_depth < max_depth:
+                sub_items = fetch_all_drive_image_items(f["id"], max_depth=max_depth, current_depth=current_depth + 1)
+                items.extend(sub_items)
+
+        page_token = res.get("nextPageToken")
+        if not page_token or _sync_cancel_event.is_set():
+            break
 
     return items
 
@@ -337,15 +354,21 @@ def run_drive_sync(folder_link_or_id: str, reindex: bool = True):
             sync_status["current_action"] = f"Fetching files for '{folder_name}' from Drive..."
             sync_status["progress_percent"] = 15
 
-            # Fast collection of image items
-            all_drive_images = fetch_all_drive_image_items(folder_id, max_depth=2)
+            # Fast collection of image items (supports up to 10 nested levels + shortcuts)
+            all_drive_images = fetch_all_drive_image_items(folder_id, max_depth=10)
             total_files = len(all_drive_images)
             sync_status["total_found"] = total_files
 
             if total_files == 0:
-                sync_status["current_action"] = f"No images found in '{folder_name}'."
+                err_msg = (
+                    f"No photos found in '{folder_name}'. "
+                    f"Please make sure the Google Drive folder contains images and is shared with: "
+                    f"suv-photography@suv-photography-514705.iam.gserviceaccount.com"
+                )
+                sync_status["current_action"] = err_msg
+                sync_status["error"] = err_msg
                 sync_status["progress_percent"] = 100
-                finish_sync_log(log_id, "COMPLETED", "No images found", 0, 0, 0, 0)
+                finish_sync_log(log_id, "COMPLETED", err_msg, 0, 0, 0, 0)
                 return
 
             sync_status["current_action"] = f"Indexing {total_files} images in high-speed parallel mode..."
