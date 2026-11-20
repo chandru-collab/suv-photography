@@ -20,12 +20,31 @@ from googleapiclient.http import MediaIoBaseDownload
 # pyrefly: ignore[missing-import]
 from googleapiclient.errors import HttpError
 
+try:
+    import certifi
+    import httplib2
+    import google_auth_httplib2
+    HAS_CERTIFI = True
+except ImportError:
+    HAS_CERTIFI = False
+
 from backend.config import BASE_DIR, DATA_DIR
 
 logger = logging.getLogger("drive_service")
 
 # Google Drive scopes
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
+
+def _create_drive_client(creds):
+    """Build googleapiclient Drive service with certifi SSL bundle to prevent certificate verification errors on Windows."""
+    if HAS_CERTIFI:
+        try:
+            http = httplib2.Http(ca_certs=certifi.where())
+            authed_http = google_auth_httplib2.AuthorizedHttp(creds, http=http)
+            return build("drive", "v3", http=authed_http, cache_discovery=False)
+        except Exception as e:
+            logger.warning(f"Error creating certifi-backed HTTP client, falling back: {e}")
+    return build("drive", "v3", credentials=creds, cache_discovery=False)
 
 # Supported media mime types
 IMAGE_MIME_TYPES = {
@@ -153,7 +172,7 @@ class GoogleDriveManager:
                 str(creds_file),
                 scopes=SCOPES
             )
-            self._service = build("drive", "v3", credentials=creds, cache_discovery=False)
+            self._service = _create_drive_client(creds)
             logger.info(f"Google Drive service initialized successfully using credentials from {creds_file.name}")
         except Exception as e:
             logger.error(f"Failed to initialize Google Drive service: {e}", exc_info=True)
@@ -173,7 +192,7 @@ class GoogleDriveManager:
                         str(self._credentials_path),
                         scopes=SCOPES
                     )
-                    self._local.service = build("drive", "v3", credentials=creds, cache_discovery=False)
+                    self._local.service = _create_drive_client(creds)
                 except Exception as e:
                     logger.warning(f"Error creating thread-local Drive service: {e}")
                     if self._service is not None:
@@ -276,17 +295,25 @@ class GoogleDriveManager:
                 continue
 
             try:
-                q = f"'{curr_id}' in parents and mimeType = '{FOLDER_MIME_TYPE}' and trashed = false"
+                q = f"'{curr_id}' in parents and (mimeType = '{FOLDER_MIME_TYPE}' or mimeType = 'application/vnd.google-apps.shortcut') and trashed = false"
                 res = self.service.files().list(
                     q=q,
                     pageSize=100,
-                    fields="files(id)",
+                    fields="files(id, mimeType, shortcutDetails)",
                     supportsAllDrives=True,
                     includeItemsFromAllDrives=True
                 ).execute()
 
                 for sub in res.get("files", []):
                     sub_id = sub["id"]
+                    sub_mime = sub.get("mimeType", "")
+                    if sub_mime == "application/vnd.google-apps.shortcut":
+                        sc = sub.get("shortcutDetails", {})
+                        if sc.get("targetMimeType") == FOLDER_MIME_TYPE:
+                            sub_id = sc.get("targetId", sub_id)
+                        else:
+                            continue
+
                     if sub_id not in result_ids:
                         result_ids.add(sub_id)
                         queue.append((sub_id, depth + 1))
@@ -349,19 +376,27 @@ class GoogleDriveManager:
             if current_depth >= max_depth:
                 return node
 
-            q = f"'{root_folder_id}' in parents and mimeType = '{FOLDER_MIME_TYPE}' and trashed = false"
+            q = f"'{root_folder_id}' in parents and (mimeType = '{FOLDER_MIME_TYPE}' or mimeType = 'application/vnd.google-apps.shortcut') and trashed = false"
             res = self.service.files().list(
                 q=q,
                 pageSize=100,
                 orderBy="name",
-                fields="files(id, name, mimeType, modifiedTime)",
+                fields="files(id, name, mimeType, modifiedTime, shortcutDetails)",
                 supportsAllDrives=True,
                 includeItemsFromAllDrives=True
             ).execute()
 
             for sub in res.get("files", []):
+                sub_id = sub["id"]
+                sub_mime = sub.get("mimeType", "")
+                if sub_mime == "application/vnd.google-apps.shortcut":
+                    sc = sub.get("shortcutDetails", {})
+                    if sc.get("targetMimeType") == FOLDER_MIME_TYPE:
+                        sub_id = sc.get("targetId", sub_id)
+                    else:
+                        continue
                 child_node = self.list_folder_structure(
-                    sub["id"],
+                    sub_id,
                     max_depth=max_depth,
                     current_depth=current_depth + 1
                 )
@@ -394,7 +429,7 @@ class GoogleDriveManager:
         q = f"'{folder_id}' in parents and trashed = false"
         fields = (
             "nextPageToken, files(id, name, mimeType, size, modifiedTime, createdTime, "
-            "thumbnailLink, webViewLink, webContentLink, imageMediaMetadata, videoMediaMetadata)"
+            "thumbnailLink, webViewLink, webContentLink, imageMediaMetadata, videoMediaMetadata, shortcutDetails)"
         )
 
         try:
@@ -424,6 +459,15 @@ class GoogleDriveManager:
             name = item.get("name", "Untitled")
             raw_thumb = item.get("thumbnailLink")
 
+            # Resolve Google Drive Shortcuts to target folder/file
+            if mime == "application/vnd.google-apps.shortcut":
+                shortcut = item.get("shortcutDetails", {})
+                target_id = shortcut.get("targetId")
+                target_mime = shortcut.get("targetMimeType", "")
+                if target_id:
+                    file_id = target_id
+                    mime = target_mime
+
             ext = Path(name).suffix.lower()
             is_image = mime in IMAGE_MIME_TYPES or mime.startswith("image/") or ext in {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".heic"}
             is_video = mime in VIDEO_MIME_TYPES or mime.startswith("video/") or ext in {".mp4", ".mov", ".avi", ".webm", ".mkv", ".3gp"}
@@ -437,8 +481,6 @@ class GoogleDriveManager:
                 })
             elif is_image:
                 img_meta = item.get("imageMediaMetadata", {}) or {}
-                # Build optimized thumbnail and high-res preview URLs
-                # Note: raw_thumb format is usually ...=s220
                 thumb_url = f"/api/drive/thumbnail/{file_id}?size=400"
                 preview_url = f"/api/drive/media/{file_id}"
                 cdn_thumb = self.build_cdn_thumbnail(thumb_link=raw_thumb, file_id=file_id, size=400)
@@ -482,6 +524,77 @@ class GoogleDriveManager:
                     "width": vid_meta.get("width"),
                     "height": vid_meta.get("height")
                 })
+
+        # If current folder has 0 direct media files but contains subfolders, recursively aggregate media
+        if len(photos) == 0 and len(videos) == 0 and len(subfolders) > 0:
+            logger.info(f"Folder {folder_id} has 0 direct media files. Aggregating from child subfolders...")
+            descendant_queue = [sf["id"] for sf in subfolders]
+            visited_sub = set(descendant_queue)
+            while descendant_queue and len(photos) + len(videos) < 500:
+                curr_fid = descendant_queue.pop(0)
+                try:
+                    sub_q = f"'{curr_fid}' in parents and trashed = false"
+                    sub_res = self.service.files().list(
+                        q=sub_q,
+                        pageSize=150,
+                        fields=fields,
+                        supportsAllDrives=True,
+                        includeItemsFromAllDrives=True
+                    ).execute()
+                    for s_item in sub_res.get("files", []):
+                        s_mime = s_item.get("mimeType", "")
+                        s_id = s_item["id"]
+                        s_name = s_item.get("name", "Untitled")
+                        s_thumb = s_item.get("thumbnailLink")
+
+                        if s_mime == "application/vnd.google-apps.shortcut":
+                            s_sc = s_item.get("shortcutDetails", {})
+                            s_id = s_sc.get("targetId", s_id)
+                            s_mime = s_sc.get("targetMimeType", s_mime)
+
+                        s_ext = Path(s_name).suffix.lower()
+                        if s_mime == FOLDER_MIME_TYPE:
+                            if s_id not in visited_sub and len(visited_sub) < 30:
+                                visited_sub.add(s_id)
+                                descendant_queue.append(s_id)
+                        elif s_mime in IMAGE_MIME_TYPES or s_mime.startswith("image/") or s_ext in {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".heic"}:
+                            thumb_url = f"/api/drive/thumbnail/{s_id}?size=400"
+                            preview_url = f"/api/drive/media/{s_id}"
+                            cdn_thumb = self.build_cdn_thumbnail(thumb_link=s_thumb, file_id=s_id, size=400)
+                            cdn_preview = self.build_cdn_thumbnail(thumb_link=s_thumb, file_id=s_id, size=1600)
+                            photos.append({
+                                "id": s_id,
+                                "name": s_name,
+                                "mimeType": s_mime,
+                                "size": int(s_item.get("size", 0) or 0),
+                                "createdTime": s_item.get("createdTime"),
+                                "modifiedTime": s_item.get("modifiedTime"),
+                                "thumbnail_url": thumb_url,
+                                "preview_url": preview_url,
+                                "cdn_thumb": cdn_thumb or thumb_url,
+                                "cdn_preview": cdn_preview or preview_url,
+                                "webViewLink": s_item.get("webViewLink"),
+                                "webContentLink": s_item.get("webContentLink")
+                            })
+                        elif s_mime in VIDEO_MIME_TYPES or s_mime.startswith("video/") or s_ext in {".mp4", ".mov", ".avi", ".webm", ".mkv", ".3gp"}:
+                            thumb_url = f"/api/drive/thumbnail/{s_id}?size=600"
+                            cdn_thumb = self.build_cdn_thumbnail(thumb_link=s_thumb, file_id=s_id, size=600)
+                            preview_url = f"/api/drive/media/{s_id}"
+                            videos.append({
+                                "id": s_id,
+                                "name": s_name,
+                                "mimeType": s_mime,
+                                "size": int(s_item.get("size", 0) or 0),
+                                "createdTime": s_item.get("createdTime"),
+                                "modifiedTime": s_item.get("modifiedTime"),
+                                "thumbnail_url": thumb_url,
+                                "preview_url": preview_url,
+                                "cdn_thumb": cdn_thumb or thumb_url,
+                                "webViewLink": s_item.get("webViewLink"),
+                                "previewEmbed": f"https://drive.google.com/file/d/{s_id}/preview"
+                            })
+                except Exception as ex:
+                    logger.warning(f"Error crawling subfolder {curr_fid}: {ex}")
 
         breadcrumbs = self.get_folder_breadcrumbs(folder_id)
         parents = folder_info.get("parents", [])
