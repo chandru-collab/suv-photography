@@ -475,12 +475,16 @@
 
     function extractFolderId(text) {
         if (!text) return null;
-        text = text.trim();
+        text = text.trim().replace(/^["']|["']$/g, '');
         const m1 = text.match(/folders\/([a-zA-Z0-9_\-]+)/);
         if (m1) return m1[1];
+        const md = text.match(/\/(?:file\/|document\/)?d\/([a-zA-Z0-9_\-]+)/);
+        if (md) return md[1];
         const m2 = text.match(/[?&]id=([a-zA-Z0-9_\-]+)/);
         if (m2) return m2[1];
-        if (/^[a-zA-Z0-9_\-]{20,}$/.test(text)) return text;
+        if (/^[a-zA-Z0-9_\-]{15,}$/.test(text)) return text;
+        const candidates = text.match(/[a-zA-Z0-9_\-]{18,}/g);
+        if (candidates && candidates.length > 0) return candidates[0];
         return null;
     }
 

@@ -257,10 +257,23 @@ def process_drive_image_in_memory(
         import gc
         gc.collect()
 
-def fetch_all_drive_image_items(folder_id: str, max_depth: int = 10, current_depth: int = 0) -> List[Dict[str, Any]]:
+def fetch_all_drive_image_items(
+    folder_id: str,
+    max_depth: int = 10,
+    current_depth: int = 0,
+    visited_folders: Optional[Set[str]] = None
+) -> List[Dict[str, Any]]:
     """Recursively collect image items from Google Drive folder structure using Drive API."""
+    if visited_folders is None:
+        visited_folders = set()
+
+    clean_id = drive_manager.extract_folder_id(folder_id) or folder_id
+    if not clean_id or clean_id in visited_folders or current_depth > max_depth:
+        return []
+    visited_folders.add(clean_id)
+
     items = []
-    q = f"'{folder_id}' in parents and trashed = false"
+    q = f"'{clean_id}' in parents and trashed = false"
     page_token = None
 
     while True:
@@ -277,8 +290,8 @@ def fetch_all_drive_image_items(folder_id: str, max_depth: int = 10, current_dep
                 includeItemsFromAllDrives=True
             ).execute()
         except Exception as e:
-            logger.error(f"Failed to fetch Drive items for folder {folder_id}: {e}")
-            raise RuntimeError(f"Error accessing Google Drive folder {folder_id}: {e}")
+            logger.error(f"Failed to fetch Drive items for folder {clean_id}: {e}")
+            raise RuntimeError(f"Error accessing Google Drive folder {clean_id}: {e}")
 
         for f in res.get("files", []):
             mime = f.get("mimeType", "")
@@ -291,20 +304,20 @@ def fetch_all_drive_image_items(folder_id: str, max_depth: int = 10, current_dep
                 target_mime = shortcut.get("targetMimeType", "")
                 if target_id:
                     if target_mime == FOLDER_MIME_TYPE and current_depth < max_depth:
-                        sub_items = fetch_all_drive_image_items(target_id, max_depth=max_depth, current_depth=current_depth + 1)
+                        sub_items = fetch_all_drive_image_items(target_id, max_depth=max_depth, current_depth=current_depth + 1, visited_folders=visited_folders)
                         items.extend(sub_items)
                     elif target_mime in IMAGE_MIME_TYPES or target_mime.startswith("image/") or ext in VALID_EXTENSIONS:
                         f["id"] = target_id
                         f["mimeType"] = target_mime
-                        f["parent_folder_id"] = folder_id
+                        f["parent_folder_id"] = clean_id
                         items.append(f)
                 continue
 
             if mime in IMAGE_MIME_TYPES or mime.startswith("image/") or ext in VALID_EXTENSIONS:
-                f["parent_folder_id"] = folder_id
+                f["parent_folder_id"] = clean_id
                 items.append(f)
             elif mime == FOLDER_MIME_TYPE and current_depth < max_depth:
-                sub_items = fetch_all_drive_image_items(f["id"], max_depth=max_depth, current_depth=current_depth + 1)
+                sub_items = fetch_all_drive_image_items(f["id"], max_depth=max_depth, current_depth=current_depth + 1, visited_folders=visited_folders)
                 items.extend(sub_items)
 
         page_token = res.get("nextPageToken")

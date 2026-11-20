@@ -237,47 +237,72 @@ class GoogleDriveManager:
 
     @staticmethod
     def extract_folder_id(url_or_id: str) -> Optional[str]:
-        """Extract Google Drive folder ID from link or raw alphanumeric string."""
+        """Extract Google Drive folder ID from any link format or raw string."""
         if not url_or_id:
             return None
-        text = str(url_or_id).strip()
+        text = str(url_or_id).strip().strip('"\'')
 
+        # 1. Standard folders URL (supports .../drive/folders/ID, .../drive/u/0/folders/ID, etc.)
         m1 = re.search(r"folders/([a-zA-Z0-9_\-]+)", text)
         if m1:
             return m1.group(1)
 
-        m_d = re.search(r"/(?:file/)?d/([a-zA-Z0-9_\-]+)", text)
+        # 2. File / doc / view URLs: .../d/ID
+        m_d = re.search(r"/(?:file/|document/|spreadsheets/|presentation/)?d/([a-zA-Z0-9_\-]+)", text)
         if m_d:
             return m_d.group(1)
 
+        # 3. Query param id: ...?id=ID or &id=ID
         m2 = re.search(r"[?&]id=([a-zA-Z0-9_\-]+)", text)
         if m2:
             return m2.group(1)
 
-        if re.fullmatch(r"[a-zA-Z0-9_\-]{20,}", text):
+        # 4. Raw alphanumeric Google Drive ID (15 to 64 chars)
+        if re.fullmatch(r"[a-zA-Z0-9_\-]{15,}", text):
             return text
+
+        # 5. Fallback: longest alphanumeric string with Drive ID characteristics
+        candidates = re.findall(r"[a-zA-Z0-9_\-]{18,}", text)
+        if candidates:
+            return candidates[0]
 
         return None
 
     def get_folder_metadata(self, folder_id: str) -> Dict[str, Any]:
-        """Retrieve folder details like name, id, parents."""
+        """Retrieve folder details like name, id, parents. Resolves shortcuts and parent folders automatically."""
+        clean_id = self.extract_folder_id(folder_id) or folder_id
         try:
-            return self.service.files().get(
-                fileId=folder_id,
-                fields="id, name, mimeType, parents, modifiedTime, webViewLink",
+            meta = self.service.files().get(
+                fileId=clean_id,
+                fields="id, name, mimeType, parents, modifiedTime, webViewLink, shortcutDetails",
                 supportsAllDrives=True
             ).execute()
+
+            # If folder is a shortcut, resolve the target folder
+            if meta.get("mimeType") == "application/vnd.google-apps.shortcut":
+                sc = meta.get("shortcutDetails", {})
+                target_id = sc.get("targetId")
+                if target_id and sc.get("targetMimeType") == FOLDER_MIME_TYPE:
+                    return self.get_folder_metadata(target_id)
+
+            # If user pasted a file link instead of a folder, resolve its parent folder
+            if meta.get("mimeType") != FOLDER_MIME_TYPE and meta.get("parents"):
+                parent_id = meta["parents"][0]
+                return self.get_folder_metadata(parent_id)
+
+            return meta
         except HttpError as e:
-            logger.error(f"Error fetching folder metadata for {folder_id}: {e}")
+            logger.error(f"Error fetching folder metadata for {clean_id}: {e}")
             raise
 
-    def get_descendant_folder_ids(self, root_folder_id: str, max_depth: int = 3, ttl: float = 300.0) -> List[str]:
+    def get_descendant_folder_ids(self, root_folder_id: str, max_depth: int = 4, ttl: float = 300.0) -> List[str]:
         """
         Recursively discover all child and descendant folder IDs for an event folder.
         Uses in-memory cache with 5-minute TTL to ensure search executes in milliseconds.
         """
+        clean_root = self.extract_folder_id(root_folder_id) or root_folder_id
         now = time.time()
-        cache_key = f"{root_folder_id}_{max_depth}"
+        cache_key = f"{clean_root}_{max_depth}"
         if not hasattr(self, "_descendants_cache"):
             self._descendants_cache = {}
 
@@ -286,8 +311,8 @@ class GoogleDriveManager:
             if now - ts < ttl:
                 return cached_ids
 
-        result_ids = {root_folder_id}
-        queue = [(root_folder_id, 0)]
+        result_ids = {clean_root}
+        queue = [(clean_root, 0)]
 
         while queue:
             curr_id, depth = queue.pop(0)
@@ -417,13 +442,15 @@ class GoogleDriveManager:
         Fetch media and subfolders directly from Google Drive for gallery viewing.
         Zero downloading to local disk or Supabase.
         """
+        clean_id = self.extract_folder_id(folder_id) or folder_id
         try:
-            folder_info = self.get_folder_metadata(folder_id)
+            folder_info = self.get_folder_metadata(clean_id)
+            folder_id = folder_info.get("id", clean_id)
         except Exception as e:
-            logger.error(f"Folder not found or accessible: {folder_id}: {e}")
+            logger.error(f"Folder not found or accessible: {clean_id}: {e}")
             return {
                 "success": False,
-                "error": f"Could not access Google Drive folder ({folder_id}). Please ensure it is shared with the service account."
+                "error": f"Could not access Google Drive folder ({clean_id}). Please ensure it is shared with the service account: suv-photography@suv-photography-514705.iam.gserviceaccount.com"
             }
 
         q = f"'{folder_id}' in parents and trashed = false"

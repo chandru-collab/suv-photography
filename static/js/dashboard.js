@@ -43,6 +43,35 @@ document.addEventListener("DOMContentLoaded", () => {
     const statThreshold = document.getElementById("statThreshold");
 
     const refreshPhotosBtn = document.getElementById("refreshPhotosBtn");
+
+    function extractFolderId(text) {
+        if (!text) return null;
+        text = text.trim().replace(/^["']|["']$/g, '');
+        const m1 = text.match(/folders\/([a-zA-Z0-9_\-]+)/);
+        if (m1) return m1[1];
+        const md = text.match(/\/(?:file\/|document\/)?d\/([a-zA-Z0-9_\-]+)/);
+        if (md) return md[1];
+        const m2 = text.match(/[?&]id=([a-zA-Z0-9_\-]+)/);
+        if (m2) return m2[1];
+        if (/^[a-zA-Z0-9_\-]{15,}$/.test(text)) return text;
+        const candidates = text.match(/[a-zA-Z0-9_\-]{18,}/g);
+        if (candidates && candidates.length > 0) return candidates[0];
+        return null;
+    }
+
+    function updateGalleryLinks(forcedId) {
+        const id = forcedId || (driveUrl ? extractFolderId(driveUrl.value) : null);
+        const galleryBtns = document.querySelectorAll('a[href^="/gallery"]');
+        galleryBtns.forEach(btn => {
+            btn.href = id ? `/gallery/${id}` : "/gallery";
+        });
+    }
+
+    if (driveUrl) {
+        driveUrl.addEventListener("input", () => updateGalleryLinks());
+        driveUrl.addEventListener("change", () => updateGalleryLinks());
+        updateGalleryLinks();
+    }
     const photosList = document.getElementById("photosList");
     const photosLoading = document.getElementById("photosLoading");
     const photosEmpty = document.getElementById("photosEmpty");
@@ -212,13 +241,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     testAccessResult.style.border = "1px solid #a3e6b7";
                     testAccessResult.style.color = "#155724";
                     const samples = (data.sample_files || []).slice(0, 4).join(", ");
+                    const nestedHtml = data.nested_note ? `<div style="margin: 4px 0; color: #055160;">ℹ️ ${data.nested_note}</div>` : '';
                     testAccessResult.innerHTML = `
-                        <strong>✅ Access Verified!</strong><br>
-                        📁 Folder Name: <strong>${data.folder_name}</strong><br>
-                        📸 Files Found: <strong>${data.file_count}</strong> (${samples}...)<br>
-                        🔑 Service Account: <code>${data.service_account}</code><br>
-                        Ready to sync! Click <strong>Sync Photos from Google Drive</strong> below.
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+                            <div>
+                                <strong>✅ Access Verified!</strong><br>
+                                📁 Event Folder: <strong>${data.folder_name}</strong><br>
+                                📸 Direct Photos: <strong>${data.file_count}</strong> ${samples ? `(${samples}...)` : ''}<br>
+                                ${nestedHtml}
+                                🔑 Service Account: <code>${data.service_account}</code>
+                            </div>
+                            <a href="/gallery/${data.folder_id}" target="_blank" class="btn btn-sm" style="background: #7d1a2c; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; white-space: nowrap;">
+                                📂 Open Gallery &rarr;
+                            </a>
+                        </div>
                     `;
+                    updateGalleryLinks(data.folder_id);
                 } else {
                     testAccessResult.style.background = "#f8d7da";
                     testAccessResult.style.border = "1px solid #f5c6cb";

@@ -30,7 +30,7 @@ from backend.config import (
     DEFAULT_DRIVE_FOLDER_ID,
     get_local_ip
 )
-from backend.drive_service import drive_manager
+from backend.drive_service import drive_manager, FOLDER_MIME_TYPE, IMAGE_MIME_TYPES
 from backend.database import (
     init_db,
     get_setting,
@@ -168,12 +168,29 @@ async def guest_page(request: Request):
     )
 
 @app.get("/gallery", response_class=HTMLResponse)
-@app.get("/gallery/{folder_id}", response_class=HTMLResponse)
+@app.get("/gallery/{folder_id:path}", response_class=HTMLResponse)
 async def gallery_page(request: Request, folder_id: Optional[str] = None):
     """Google Drive Event & Client Gallery page (zero local file duplication)."""
+    # Check query params for any passed folder link: ?folder=..., ?url=..., ?id=...
+    q_param = (
+        request.query_params.get("folder")
+        or request.query_params.get("url")
+        or request.query_params.get("folder_url")
+        or request.query_params.get("id")
+    )
+    if q_param:
+        extracted = drive_manager.extract_folder_id(q_param)
+        if extracted:
+            folder_id = extracted
+
     root_folder = get_setting("drive_folder_url", DEFAULT_DRIVE_FOLDER_ID)
     root_folder_id = drive_manager.extract_folder_id(root_folder) or DEFAULT_DRIVE_FOLDER_ID
-    active_folder_id = folder_id or root_folder_id
+
+    if folder_id:
+        active_folder_id = drive_manager.extract_folder_id(folder_id) or folder_id
+    else:
+        active_folder_id = root_folder_id
+
     event_name = get_setting("event_name", "Event Gallery")
     return templates.TemplateResponse(
         request=request,
@@ -588,13 +605,14 @@ async def get_drive_folder_tree(root_id: Optional[str] = None):
     tree = drive_manager.list_folder_structure(root_id, max_depth=3)
     return {"success": True, "tree": tree}
 
-@app.get("/api/drive/gallery/{folder_id}")
+@app.get("/api/drive/gallery/{folder_id:path}")
 async def get_drive_gallery_items(folder_id: str, pageToken: Optional[str] = None, pageSize: int = 150):
     """Fetch photos and videos directly from Google Drive API with zero disk downloads."""
-    if folder_id == "root" or not folder_id:
+    clean_id = drive_manager.extract_folder_id(folder_id) or folder_id
+    if clean_id == "root" or not clean_id:
         root_url = get_setting("drive_folder_url", DEFAULT_DRIVE_FOLDER_ID)
-        folder_id = drive_manager.extract_folder_id(root_url) or DEFAULT_DRIVE_FOLDER_ID
-    items = drive_manager.list_gallery_contents(folder_id, page_size=pageSize, page_token=pageToken)
+        clean_id = drive_manager.extract_folder_id(root_url) or DEFAULT_DRIVE_FOLDER_ID
+    items = drive_manager.list_gallery_contents(clean_id, page_size=pageSize, page_token=pageToken)
     return items
 
 @app.get("/api/drive/thumbnail/{file_id}")
@@ -842,28 +860,52 @@ async def check_drive_access(folder_url: str):
 
     try:
         meta = drive_manager.get_folder_metadata(folder_id)
-        q = f"'{folder_id}' in parents and trashed = false"
+        resolved_id = meta.get("id", folder_id)
+        q = f"'{resolved_id}' in parents and trashed = false"
         res = drive_manager.service.files().list(
             q=q,
-            pageSize=20,
-            fields="files(id, name, mimeType)",
+            pageSize=100,
+            fields="files(id, name, mimeType, shortcutDetails)",
             supportsAllDrives=True,
             includeItemsFromAllDrives=True
         ).execute()
         files = res.get("files", [])
+        
+        photos = []
+        subfolders = []
+        for f in files:
+            m = f.get("mimeType", "")
+            if m == "application/vnd.google-apps.shortcut":
+                sc = f.get("shortcutDetails", {})
+                m = sc.get("targetMimeType", m)
+            ext = Path(f.get("name", "")).suffix.lower()
+            if m == FOLDER_MIME_TYPE:
+                subfolders.append(f.get("name", "Untitled Folder"))
+            elif m in IMAGE_MIME_TYPES or m.startswith("image/") or ext in {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".heic"}:
+                photos.append(f.get("name", "Untitled"))
+
+        nested_note = ""
+        total_count = len(photos)
+        if total_count == 0 and len(subfolders) > 0:
+            nested_note = f"Contains {len(subfolders)} subfolder(s) ({', '.join(subfolders[:3])}). Media in subfolders will be automatically crawled."
+
         return {
             "success": True,
-            "folder_id": folder_id,
-            "folder_name": meta.get("name"),
-            "file_count": len(files),
-            "sample_files": [f["name"] for f in files[:5]],
+            "folder_id": resolved_id,
+            "folder_name": meta.get("name", "Folder"),
+            "file_count": total_count,
+            "subfolder_count": len(subfolders),
+            "subfolders": subfolders[:5],
+            "sample_files": (photos if photos else subfolders)[:5],
+            "nested_note": nested_note,
+            "gallery_url": f"/gallery/{resolved_id}",
             "service_account": "suv-photography@suv-photography-514705.iam.gserviceaccount.com"
         }
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
-            "hint": "Please share this folder with: suv-photography@suv-photography-514705.iam.gserviceaccount.com"
+            "hint": "Please share this folder with: suv-photography@suv-photography-514705.iam.gserviceaccount.com as Viewer."
         }
 
 @app.post("/api/sync/drive", dependencies=[Depends(require_auth)])
