@@ -178,23 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Quick-Fill Verified Folder: "Hi"
-    const useVerifiedFolderBtn = document.getElementById("useVerifiedFolderBtn");
-    if (useVerifiedFolderBtn) {
-        useVerifiedFolderBtn.addEventListener("click", () => {
-            driveUrl.value = "https://drive.google.com/drive/folders/1mGQfWoHfXlVim9pEDTF92UwXblWvANGJ";
-            driveUrl.focus();
-            const resArea = document.getElementById("testAccessResult");
-            if (resArea) {
-                resArea.style.display = "block";
-                resArea.style.background = "#e6f9ed";
-                resArea.style.border = "1px solid #a3e6b7";
-                resArea.style.color = "#155724";
-                resArea.innerHTML = "✅ Selected verified event folder: <strong>'Hi'</strong> (14 files). Click <strong>Sync Photos from Google Drive</strong> below.";
-            }
-        });
-    }
-
     // Test & Verify Folder Access Diagnostic
     const testDriveAccessBtn = document.getElementById("testDriveAccessBtn");
     const testAccessResult = document.getElementById("testAccessResult");
