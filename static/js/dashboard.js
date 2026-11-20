@@ -591,27 +591,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     settingsForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const eventName = eventNameInput ? eventNameInput.value.trim() : "";
         const coupleTitle = coupleTitleInput ? coupleTitleInput.value.trim() : "";
         const eventDate = eventDateInput ? eventDateInput.value.trim() : "";
         const eventLocation = eventLocationInput ? eventLocationInput.value.trim() : "";
         const thresh = parseFloat(thresholdSlider.value);
 
+        const payload = {
+            couple_title: coupleTitle,
+            event_date: eventDate,
+            event_location: eventLocation,
+            match_threshold: thresh
+        };
+        if (eventNameInput && eventNameInput.value.trim()) {
+            payload.event_name = eventNameInput.value.trim();
+        }
+
         try {
             const res = await fetch("/api/settings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    event_name: eventName,
-                    couple_title: coupleTitle,
-                    event_date: eventDate,
-                    event_location: eventLocation,
-                    match_threshold: thresh
-                })
+                body: JSON.stringify(payload)
             });
             const data = await res.json();
             if (data.success) {
-                if (navEventName) navEventName.textContent = eventName;
+                if (navEventName && payload.event_name) navEventName.textContent = payload.event_name;
                 if (statThreshold) statThreshold.textContent = thresh;
                 alert("✅ Event & Cover details saved successfully!");
             }
