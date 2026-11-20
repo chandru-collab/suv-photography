@@ -3,41 +3,507 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Host Login - Event Photo Sharing</title>
-    <link rel="stylesheet" href="/static/css/dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Host Login - SUV Photography Studio Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --french-wine: #4a1521;
+            --french-wine-deep: #380c16;
+            --french-wine-medium: #722234;
+            --wine-gold: #dfc7aa;
+            --wine-champagne: #f7ede2;
+            --bg-page: #f8f5f0;
+            --text-main: #4a1521;
+            --text-muted: #7a4d56;
+            --border-color: rgba(74, 21, 33, 0.12);
+            --radius-md: 14px;
+            --radius-lg: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at 50% 15%, #ffffff 0%, #faf6f0 42%, #f1e7d8 100%);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Responsive Viewport Wrapper */
+        .login-wrapper {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            position: relative;
+        }
+
+        /* Ambient Luxury Glow */
+        .login-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            max-width: 90vw;
+            max-height: 90vw;
+            background: radial-gradient(circle, rgba(223, 199, 170, 0.35) 0%, rgba(74, 21, 33, 0.05) 55%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Centered Responsive Card */
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 25px 60px -15px rgba(74, 21, 33, 0.14), 0 8px 20px -6px rgba(0, 0, 0, 0.04);
+            padding: 38px 32px;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* Branding Header */
+        .login-header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .login-logo-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            background: #ffffff;
+            border: 1.5px solid rgba(223, 199, 170, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 10px 24px rgba(74, 21, 33, 0.1);
+            padding: 8px;
+            margin-bottom: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .login-logo-box:hover {
+            transform: scale(1.04);
+        }
+
+        .login-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .login-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--french-wine-deep);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+            margin-bottom: 6px;
+        }
+
+        .login-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, rgba(74, 21, 33, 0.06), rgba(223, 199, 170, 0.22));
+            border: 1px solid rgba(74, 21, 33, 0.12);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--french-wine);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Form Controls */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--french-wine);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-icon-left {
+            position: absolute;
+            left: 14px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 50px;
+            padding: 0 44px 0 42px;
+            font-size: 16px; /* Prevents auto-zoom on iOS Safari */
+            font-family: inherit;
+            color: var(--french-wine-deep);
+            background: #ffffff;
+            border: 1.5px solid rgba(74, 21, 33, 0.18);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--french-wine-medium);
+            background: #ffffff;
+            box-shadow: 0 0 0 3.5px rgba(114, 34, 52, 0.12);
+        }
+
+        .form-input::placeholder {
+            color: rgba(122, 77, 86, 0.55);
+            font-size: 0.9rem;
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 10px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s ease;
+        }
+
+        .toggle-password-btn:hover {
+            color: var(--french-wine);
+        }
+
+        /* Default password hint pill */
+        .default-hint {
+            background: rgba(223, 199, 170, 0.2);
+            border: 1px dashed rgba(223, 199, 170, 0.85);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            color: var(--french-wine);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .default-hint:hover {
+            background: rgba(223, 199, 170, 0.35);
+        }
+
+        .default-hint code {
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 7px;
+            border-radius: 6px;
+            border: 1px solid rgba(74, 21, 33, 0.12);
+            color: var(--french-wine-deep);
+        }
+
+        /* Alert error */
+        .alert-error {
+            background: #fdf2f2;
+            border: 1px solid #f8b4b4;
+            color: #9b1c1c;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.35s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 10px 24px -5px rgba(74, 21, 33, 0.38);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 4px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-1.5px);
+            box-shadow: 0 14px 28px -5px rgba(74, 21, 33, 0.45);
+            background: linear-gradient(135deg, #7e273b 0%, #541826 100%);
+        }
+
+        .btn-submit:active:not(:disabled) {
+            transform: scale(0.985);
+            box-shadow: 0 4px 12px rgba(74, 21, 33, 0.2);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Navigation Links */
+        .login-footer-links {
+            margin-top: 22px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .footer-link {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--french-wine-medium);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.15s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--french-wine-deep);
+            text-decoration: underline;
+        }
+
+        .portal-copyright {
+            margin-top: 18px;
+            font-size: 0.74rem;
+            color: rgba(122, 77, 86, 0.7);
+            letter-spacing: 0.02em;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .login-wrapper {
+                padding: 16px 12px;
+                justify-content: center;
+            }
+
+            .login-card {
+                padding: 28px 20px;
+                border-radius: 20px;
+            }
+
+            .login-logo-box {
+                width: 64px;
+                height: 64px;
+                border-radius: 16px;
+                padding: 6px;
+            }
+
+            .login-title {
+                font-size: 1.3rem;
+            }
+
+            .login-subtitle {
+                font-size: 0.82rem;
+            }
+
+            .form-input, .btn-submit {
+                height: 48px;
+            }
+        }
+
+        /* Landscape Mobile & Small Laptop Height Adjustment */
+        @media (max-height: 650px) {
+            .login-wrapper {
+                padding: 12px 16px;
+            }
+            .login-card {
+                padding: 22px 24px;
+            }
+            .login-logo-box {
+                width: 52px;
+                height: 52px;
+                margin-bottom: 8px;
+            }
+            .login-header {
+                margin-bottom: 16px;
+            }
+            .login-title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
 </head>
-<body class="login-body">
-    <div class="login-card">
-        <div class="login-header">
-            <div class="login-icon" style="background: transparent; display: flex; align-items: center; justify-content: center;">
-                <img src="/static/img/suv_badge.png" alt="SUV Photography Logo" style="width: 54px; height: 54px; border-radius: 14px; object-fit: contain;">
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <!-- Studio Branding Header -->
+            <div class="login-header">
+                <div class="login-logo-box" title="SUV Photography">
+                    <img src="/static/img/suv_monogram_black.png" alt="SUV Photography Logo" class="login-logo-img">
+                </div>
+                <div class="login-title">SUV Photography</div>
+                <div class="login-badge-pill">Studio Pro &bull; Host Portal</div>
+                <p class="login-subtitle">Enter password to manage event photos, Google Drive sync &amp; guest standees.</p>
             </div>
-            <h2>SUV Photography Arakkonam</h2>
-            <p>Host Dashboard &bull; Enter password to manage event photos</p>
+
+            <!-- Host Login Form -->
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <span>Host Access Password</span>
+                    </label>
+                    <div class="input-wrap">
+                        <span class="input-icon-left">🔒</span>
+                        <input type="password" id="password" name="password" class="form-input" placeholder="Enter host password" required autofocus autocomplete="current-password">
+                        <button type="button" class="toggle-password-btn" id="togglePasswordBtn" title="Toggle password visibility" aria-label="Toggle password visibility">
+                            <span id="eyeIcon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Auto-fill hint for quick host convenience -->
+                <div class="default-hint" id="autoFillHint" title="Click to auto-fill default host password">
+                    <span>💡 Default: <code>photo123</code></span>
+                    <span style="font-weight: 600; text-decoration: underline;">Click to fill</span>
+                </div>
+
+                <div id="loginError" class="alert-error" style="display: none;">
+                    <span>⚠️</span>
+                    <span id="loginErrorText">Invalid password</span>
+                </div>
+
+                <button type="submit" class="btn-submit" id="loginBtn">
+                    <span>🔓</span>
+                    <span>Log In to Host Dashboard</span>
+                </button>
+            </form>
+
+            <!-- Navigation Links -->
+            <div class="login-footer-links">
+                <a href="/guest" class="footer-link">
+                    <span>👁️</span> Open Guest Selfie Search
+                </a>
+                <a href="/gallery" class="footer-link">
+                    <span>📂</span> Open Drive Gallery
+                </a>
+            </div>
         </div>
 
-        <form id="loginForm" class="login-form">
-            <div class="form-group">
-                <label for="password">Host Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter host password" required autofocus>
-            </div>
-            <div id="loginError" class="alert-error" style="display: none;"></div>
-            <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Log In</button>
-        </form>
+        <div class="portal-copyright">
+            SUV Photography Studio Arakkonam &bull; Private Host Dashboard
+        </div>
     </div>
 
     <script>
-        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        const passwordInput = document.getElementById("password");
+        const toggleBtn = document.getElementById("togglePasswordBtn");
+        const eyeIcon = document.getElementById("eyeIcon");
+        const autoFillHint = document.getElementById("autoFillHint");
+        const loginForm = document.getElementById("loginForm");
+        const loginBtn = document.getElementById("loginBtn");
+        const errBox = document.getElementById("loginError");
+        const errText = document.getElementById("loginErrorText");
+
+        // Toggle password show/hide
+        toggleBtn.addEventListener("click", () => {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.textContent = "🙈";
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.textContent = "👁️";
+            }
+            passwordInput.focus();
+        });
+
+        // Click hint to auto-fill default password
+        autoFillHint.addEventListener("click", () => {
+            passwordInput.value = "photo123";
+            passwordInput.focus();
+        });
+
+        // Form Submit
+        loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const btn = document.getElementById("loginBtn");
-            const errBox = document.getElementById("loginError");
             errBox.style.display = "none";
-            btn.disabled = true;
-            btn.textContent = "Logging in...";
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = "<span>⏳</span><span>Verifying credentials...</span>";
 
             const formData = new FormData();
-            formData.append("password", document.getElementById("password").value);
+            formData.append("password", passwordInput.value);
 
             try {
                 const res = await fetch("/api/auth/login", {
@@ -46,18 +512,23 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    window.location.href = data.redirect || "/dashboard";
+                    loginBtn.innerHTML = "<span>✅</span><span>Access Granted! Redirecting...</span>";
+                    loginBtn.style.background = "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+                    setTimeout(() => {
+                        window.location.href = data.redirect || "/dashboard";
+                    }, 400);
                 } else {
-                    errBox.textContent = data.error || "Invalid password";
-                    errBox.style.display = "block";
-                    btn.disabled = false;
-                    btn.textContent = "Log In";
+                    errText.textContent = data.error || "Incorrect password. Please try again.";
+                    errBox.style.display = "flex";
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = "<span>🔓</span><span>Log In to Host Dashboard</span>";
+                    passwordInput.select();
                 }
             } catch (err) {
-                errBox.textContent = "Failed to connect to server.";
-                errBox.style.display = "block";
-                btn.disabled = false;
-                btn.textContent = "Log In";
+                errText.textContent = "Cannot connect to server. Please ensure the Python server is running.";
+                errBox.style.display = "flex";
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = "<span>🔓</span><span>Log In to Host Dashboard</span>";
             }
         });
     </script>
