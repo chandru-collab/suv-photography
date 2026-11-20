@@ -110,30 +110,6 @@
             }
         });
 
-        // Quick Drive Link Switcher in Gallery
-        const quickSwitchForm = document.getElementById('quickSwitchForm');
-        const quickFolderUrl = document.getElementById('quickFolderUrl');
-        if (quickSwitchForm && quickFolderUrl) {
-            quickSwitchForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const raw = quickFolderUrl.value.trim();
-                const fid = extractFolderId(raw);
-                if (!fid) {
-                    alert('Please enter a valid Google Drive folder link or folder ID.');
-                    return;
-                }
-                loadFolder(fid);
-
-                // Update backend active folder setting in background and auto-index faces
-                fetch('/api/drive/switch-folder', {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ folder_url: raw, auto_sync: true, clear_previous: true })
-                }).catch(() => {});
-            });
-        }
-
         // Lightbox Close
         elements.closeLightboxBtn.addEventListener('click', closeLightbox);
         elements.lightboxModal.addEventListener('click', (e) => {

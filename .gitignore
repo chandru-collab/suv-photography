@@ -22,7 +22,5 @@ suv-photography-*.json
 *credentials*.json
 
 # Deployment caches & local build artifacts
-.vercel/
-.render/
 .DS_Store
 Thumbs.db
