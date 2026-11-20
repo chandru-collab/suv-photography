@@ -15,9 +15,12 @@ def main():
     # Ensure database schema is initialized on startup before any queries
     init_db()
 
-    # Production CPU Worker Auto-Tuning: respect WEB_CONCURRENCY, auto-scale based on cores
-    default_workers = max(1, min(4, (os.cpu_count() or 1)))
-    workers = int(os.environ.get("WEB_CONCURRENCY", default_workers))
+    # Production CPU Worker Auto-Tuning: on Windows default to 1 worker to avoid socket listen issues
+    if sys.platform == "win32":
+        workers = int(os.environ.get("WEB_CONCURRENCY", 1))
+    else:
+        default_workers = max(1, min(4, (os.cpu_count() or 1)))
+        workers = int(os.environ.get("WEB_CONCURRENCY", default_workers))
 
     guest_url = get_guest_url()
 
@@ -42,17 +45,20 @@ def main():
     print(" Starting production Uvicorn cluster...")
     print(" Press Ctrl+C to terminate.\n")
 
-    uvicorn.run(
-        "backend.app:app",
-        host=SERVER_HOST,
-        port=SERVER_PORT,
-        workers=workers,
-        backlog=2048,
-        limit_concurrency=2000,
-        timeout_keep_alive=30,
-        access_log=False, # Structured JSON access log is emitted by ProductionMiddleware
-        log_level="info"
-    )
+    run_kwargs = {
+        "app": "backend.app:app",
+        "host": SERVER_HOST,
+        "port": SERVER_PORT,
+        "timeout_keep_alive": 30,
+        "access_log": False,
+        "log_level": "info"
+    }
+    if workers > 1:
+        run_kwargs["workers"] = workers
+        run_kwargs["backlog"] = 2048
+        run_kwargs["limit_concurrency"] = 2000
+
+    uvicorn.run(**run_kwargs)
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
