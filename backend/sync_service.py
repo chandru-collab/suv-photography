@@ -348,7 +348,7 @@ def run_drive_sync(folder_link_or_id: str, reindex: bool = True):
         log_id = start_sync_log(f"Syncing Google Drive folder ID: {folder_id}")
 
         if not drive_manager.is_configured:
-            err_msg = "Google Drive credentials not configured on server. Please add 'GOOGLE_CREDENTIALS_JSON' in Render Environment Variables."
+            err_msg = "Google Drive credentials not configured on server. Please add your Service Account JSON file or set GOOGLE_CREDENTIALS_JSON."
             sync_status["current_action"] = f"Drive sync failed: {err_msg}"
             sync_status["error"] = err_msg
             sync_status["progress_percent"] = 0

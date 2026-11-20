@@ -837,7 +837,7 @@ async def check_drive_access(folder_url: str):
         return {
             "success": False,
             "error": "Google Drive credentials not configured on server.",
-            "hint": "Set GOOGLE_CREDENTIALS_JSON in Render Environment Variables."
+            "hint": "Ensure your Google Cloud Service Account JSON file is present or set GOOGLE_CREDENTIALS_JSON."
         }
 
     try:

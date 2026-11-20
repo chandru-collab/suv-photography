@@ -188,7 +188,7 @@ class GoogleDriveManager:
         if svc is None:
             raise RuntimeError(
                 "Google Drive service is not configured. "
-                "Please add 'GOOGLE_CREDENTIALS_JSON' in Render Environment Variables with your Service Account JSON."
+                "Please ensure your Service Account JSON credentials file is present or set 'GOOGLE_CREDENTIALS_JSON'."
             )
         return svc
 
