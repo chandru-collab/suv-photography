@@ -202,7 +202,7 @@ def process_drive_image_in_memory(
             if row:
                 existing_photo = dict(row)
 
-        img_bgr = face_engine.load_image_from_bytes(image_bytes, max_dimension=1600)
+        img_bgr = face_engine.load_image_from_bytes(image_bytes)
         if img_bgr is None:
             return False, 0
 

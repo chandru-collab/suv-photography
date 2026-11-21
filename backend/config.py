@@ -38,11 +38,12 @@ SESSION_COOKIE_NAME = "event_host_token"
 # OpenCV SFace high-precision cosine similarity threshold is 0.48.
 # At 0.48, false positive rate drops to ~0 while true matches (0.60-0.75) are preserved.
 DEFAULT_MATCH_THRESHOLD = float(os.environ.get("MATCH_THRESHOLD", "0.48"))
-FACE_DETECTOR_SCORE_THRESH = 0.40
+FACE_DETECTOR_SCORE_THRESH = 0.32
 FACE_DETECTOR_NMS_THRESH = 0.35
-YOLO_CONF_THRESH = 0.35
+YOLO_CONF_THRESH = 0.28
 YOLO_NMS_THRESH = 0.45
 USE_YOLO_DETECTOR = True
+MAX_IMAGE_DIMENSION = 2560
 
 # Server Settings
 SERVER_HOST = os.environ.get("SERVER_HOST", "0.0.0.0")

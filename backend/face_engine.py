@@ -23,10 +23,28 @@ from backend.config import (
     YOLO_NMS_THRESH,
     USE_YOLO_DETECTOR,
     DEFAULT_MATCH_THRESHOLD,
+    MAX_IMAGE_DIMENSION,
     THUMBNAILS_DIR
 )
 
 logger = logging.getLogger("face_engine")
+
+def enhance_face_lighting(aligned_bgr: np.ndarray) -> np.ndarray:
+    """
+    Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) on L-channel (LAB space)
+    to balance illumination, harsh flash glares, and dark venue shadows.
+    """
+    try:
+        if aligned_bgr is None or aligned_bgr.size == 0:
+            return aligned_bgr
+        lab = cv2.cvtColor(aligned_bgr, cv2.COLOR_BGR2LAB)
+        l, a, b = cv2.split(lab)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
+        cl = clahe.apply(l)
+        enhanced_lab = cv2.merge((cl, a, b))
+        return cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+    except Exception:
+        return aligned_bgr
 
 class FaceEngine:
     def __init__(self):
@@ -83,7 +101,7 @@ class FaceEngine:
             logger.error(f"Failed to initialize face engine: {e}")
             raise e
 
-    def load_image_from_bytes(self, image_bytes: bytes, max_dimension: Optional[int] = 1600) -> Optional[np.ndarray]:
+    def load_image_from_bytes(self, image_bytes: bytes, max_dimension: Optional[int] = MAX_IMAGE_DIMENSION) -> Optional[np.ndarray]:
         """Load image bytes into BGR OpenCV format, respecting EXIF orientation and downsampling to max_dimension for memory safety."""
         try:
             pil_img = Image.open(io.BytesIO(image_bytes))
@@ -204,12 +222,12 @@ class FaceEngine:
             # 1. Adaptive multi-scale YuNet evaluation
             scales = [1.0]
             if multi_scale:
-                if max_dim > 2000:
-                    scales = [1600.0 / max_dim, 1.0]
-                elif max_dim < 600:
-                    scales = [1.0, 1.4]
-                elif max_dim > 1000:
-                    scales = [1.0, 0.75]
+                if max_dim > 2200:
+                    scales = [1800.0 / max_dim, 1.0]
+                elif max_dim < 700:
+                    scales = [1.0, 1.35]
+                elif max_dim > 1100:
+                    scales = [1.0, 0.80]
 
             candidate_faces = []
             for s in scales:
@@ -297,29 +315,51 @@ class FaceEngine:
                     if face[4] > 0 and face[6] > 0:
                         aligned_face = self.recognizer.alignCrop(img_bgr, face)
                     else:
-                        # Direct crop with 15% margin for YOLO-only detected faces
-                        mx = int(bw * 0.15)
-                        my = int(bh * 0.15)
-                        x1 = max(0, bx - mx)
-                        y1 = max(0, by - my)
-                        x2 = min(w, bx + bw + mx)
-                        y2 = min(h, by + bh + my)
-                        cropped = img_bgr[y1:y2, x1:x2]
-                        if cropped.size > 0:
-                            aligned_face = cv2.resize(cropped, (112, 112), interpolation=cv2.INTER_LINEAR)
-                        else:
-                            aligned_face = None
+                        # Refine YOLO bounding box with localized high-resolution YuNet pass
+                        crop_margin = 0.25
+                        cx1 = max(0, int(bx - bw * crop_margin))
+                        cy1 = max(0, int(by - bh * crop_margin))
+                        cx2 = min(w, int(bx + bw * (1.0 + crop_margin)))
+                        cy2 = min(h, int(by + bh * (1.0 + crop_margin)))
+                        local_crop = img_bgr[cy1:cy2, cx1:cx2]
+                        aligned_face = None
+                        if local_crop.size > 0:
+                            ch_c, cw_c = local_crop.shape[:2]
+                            self.detector.setInputSize((cw_c, ch_c))
+                            _, loc_detected = self.detector.detect(local_crop)
+                            if loc_detected is not None and len(loc_detected) > 0:
+                                best_local = loc_detected[0].copy()
+                                best_local[0] += cx1
+                                best_local[1] += cy1
+                                best_local[4:14:2] += cx1
+                                best_local[5:14:2] += cy1
+                                aligned_face = self.recognizer.alignCrop(img_bgr, best_local)
+                        if aligned_face is None:
+                            mx = int(bw * 0.15)
+                            my = int(bh * 0.15)
+                            x1 = max(0, bx - mx)
+                            y1 = max(0, by - my)
+                            x2 = min(w, bx + bw + mx)
+                            y2 = min(h, by + bh + my)
+                            cropped = img_bgr[y1:y2, x1:x2]
+                            if cropped.size > 0:
+                                aligned_face = cv2.resize(cropped, (112, 112), interpolation=cv2.INTER_LINEAR)
 
                     if aligned_face is not None and aligned_face.shape[0] == 112 and aligned_face.shape[1] == 112:
-                        raw_feature = self.recognizer.feature(aligned_face) # shape (1, 128)
-                        feat_1d = raw_feature.flatten().astype(np.float32)
+                        raw_feature1 = self.recognizer.feature(aligned_face).flatten().astype(np.float32)
+                        norm1 = np.linalg.norm(raw_feature1)
+                        feat1 = raw_feature1 / norm1 if norm1 > 0 else raw_feature1
 
-                        # L2 normalize feature vector for exact dot-product cosine similarity
-                        norm = np.linalg.norm(feat_1d)
-                        if norm > 0:
-                            normalized_feat = feat_1d / norm
-                        else:
-                            normalized_feat = feat_1d
+                        # Illumination-invariant CLAHE boost (removes flash glare & venue shadows)
+                        enhanced_aligned = enhance_face_lighting(aligned_face)
+                        raw_feature2 = self.recognizer.feature(enhanced_aligned).flatten().astype(np.float32)
+                        norm2 = np.linalg.norm(raw_feature2)
+                        feat2 = raw_feature2 / norm2 if norm2 > 0 else raw_feature2
+
+                        # Composite fusion: 65% canonical + 35% illumination-normalized
+                        fused_feat = (feat1 * 0.65) + (feat2 * 0.35)
+                        norm_fused = np.linalg.norm(fused_feat)
+                        normalized_feat = fused_feat / norm_fused if norm_fused > 0 else fused_feat
 
                         results.append({
                             "bbox": bbox,
