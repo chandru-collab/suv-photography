@@ -20,6 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const syncFaces = document.getElementById("syncFaces");
     const syncResultBanner = document.getElementById("syncResultBanner");
 
+    // Continuous Live Auto-Sync Elements
+    const autoSyncToggle = document.getElementById("autoSyncToggle");
+    const autoSyncBadge = document.getElementById("autoSyncBadge");
+    const autoSyncLiveDot = document.getElementById("autoSyncLiveDot");
+    const autoSyncIntervalSelect = document.getElementById("autoSyncIntervalSelect");
+    const autoSyncLastCheckTime = document.getElementById("autoSyncLastCheckTime");
+    const autoSyncNextInSec = document.getElementById("autoSyncNextInSec");
+    const autoSyncActivityMsg = document.getElementById("autoSyncActivityMsg");
+
     const dropzone = document.getElementById("dropzone");
     const directUploadInput = document.getElementById("directUploadInput");
     const uploadStatus = document.getElementById("uploadStatus");
@@ -304,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (res.status === 401) {
                 startSyncBtn.disabled = false;
-                startSyncBtn.textContent = "🔄 Index Faces from Google Drive";
+                startSyncBtn.textContent = "🔄 Sync Photos from Google Drive Now (Force Refresh)";
                 showSyncResult("error", "Session expired. Redirecting to login...");
                 setTimeout(() => { window.location.href = "/login"; }, 1500);
                 return;
@@ -316,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 pollSyncStatus();
             } else {
                 startSyncBtn.disabled = false;
-                startSyncBtn.textContent = "🔄 Index Faces from Google Drive";
+                startSyncBtn.textContent = "🔄 Sync Photos from Google Drive Now (Force Refresh)";
                 const errorMsg = (data && (data.error || data.detail)) || `Server returned HTTP ${res.status}`;
                 showSyncResult("error", errorMsg);
             }
@@ -352,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (!data.running) {
                     clearInterval(syncPollTimer);
                     startSyncBtn.disabled = false;
-                    startSyncBtn.textContent = "🔄 Sync Photos from Google Drive";
+                    startSyncBtn.textContent = "🔄 Sync Photos from Google Drive Now (Force Refresh)";
 
                     if (data.error) {
                         showSyncResult("error", data.error);
@@ -363,6 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     loadStats();
                     loadPhotos();
+                    fetchAutoSyncStatus();
                 }
             } catch (err) {
                 console.warn("Poll status error:", err);
@@ -375,6 +385,145 @@ document.addEventListener("DOMContentLoaded", () => {
         syncResultBanner.textContent = msg;
         syncResultBanner.style.display = "block";
     }
+
+    // ==========================================
+    // CONTINUOUS AUTO-SYNC UI CONTROLLER
+    // ==========================================
+    let autoSyncPollTimer = null;
+    let lastDetectedPhotosAdded = 0;
+
+    async function fetchAutoSyncStatus() {
+        try {
+            const res = await fetch("/api/sync/auto-sync");
+            if (!res.ok) return;
+            const data = await res.json();
+
+            if (autoSyncToggle) {
+                autoSyncToggle.checked = !!data.enabled;
+            }
+            if (autoSyncBadge) {
+                autoSyncBadge.textContent = data.enabled ? "Active" : "Paused";
+                autoSyncBadge.className = data.enabled ? "badge badge-success" : "badge badge-secondary";
+            }
+            if (autoSyncLiveDot) {
+                autoSyncLiveDot.style.background = data.enabled ? "#10b981" : "#94a3b8";
+                autoSyncLiveDot.style.boxShadow = data.enabled ? "0 0 10px #10b981" : "none";
+            }
+            if (autoSyncIntervalSelect && document.activeElement !== autoSyncIntervalSelect) {
+                autoSyncIntervalSelect.value = String(data.interval_seconds || 60);
+            }
+            if (autoSyncLastCheckTime) {
+                autoSyncLastCheckTime.textContent = data.last_check_time_str || "Never";
+            }
+            if (autoSyncNextInSec) {
+                if (!data.enabled) {
+                    autoSyncNextInSec.textContent = "Paused";
+                } else if (data.running) {
+                    autoSyncNextInSec.textContent = "Checking now...";
+                } else {
+                    autoSyncNextInSec.textContent = `in ~${data.next_check_in_seconds || 60}s`;
+                }
+            }
+            if (autoSyncActivityMsg) {
+                if (data.running) {
+                    autoSyncActivityMsg.style.display = "block";
+                    autoSyncActivityMsg.textContent = "🔄 Live Watcher: Checking Google Drive for new camera uploads...";
+                } else if (data.last_photos_added > 0) {
+                    autoSyncActivityMsg.style.display = "block";
+                    autoSyncActivityMsg.textContent = `✨ Auto-Sync: ${data.last_photos_added} new photo(s) (${data.last_faces_detected} faces) imported automatically!`;
+                } else {
+                    autoSyncActivityMsg.style.display = "none";
+                }
+            }
+
+            // Automatically refresh dashboard stats and photos when cameraman uploads new photos
+            if (data.last_photos_added > 0 && data.last_photos_added !== lastDetectedPhotosAdded) {
+                lastDetectedPhotosAdded = data.last_photos_added;
+                loadStats();
+                loadPhotos();
+            }
+        } catch (e) {
+            console.warn("Auto-sync status check failed:", e);
+        }
+    }
+
+    if (autoSyncToggle) {
+        autoSyncToggle.addEventListener("change", async () => {
+            const enabled = autoSyncToggle.checked;
+            const interval = parseInt(autoSyncIntervalSelect ? autoSyncIntervalSelect.value : "60", 10);
+            try {
+                await fetch("/api/sync/auto-sync", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ enabled: enabled, interval_seconds: interval })
+                });
+                fetchAutoSyncStatus();
+            } catch (e) {
+                console.error("Failed to update auto-sync state:", e);
+            }
+        });
+    }
+
+    if (autoSyncIntervalSelect) {
+        autoSyncIntervalSelect.addEventListener("change", async () => {
+            const enabled = autoSyncToggle ? autoSyncToggle.checked : true;
+            const interval = parseInt(autoSyncIntervalSelect.value, 10);
+            try {
+                await fetch("/api/sync/auto-sync", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ enabled: enabled, interval_seconds: interval })
+                });
+                fetchAutoSyncStatus();
+            } catch (e) {
+                console.error("Failed to update auto-sync interval:", e);
+            }
+        });
+    }
+
+    // Auto-detect and sync immediately when admin pastes or modifies the Drive link
+    if (driveUrl) {
+        let drivePasteDebounce = null;
+        const autoSyncOnLinkEntry = () => {
+            clearTimeout(drivePasteDebounce);
+            drivePasteDebounce = setTimeout(async () => {
+                const url = driveUrl.value.trim();
+                if (!url) return;
+                const folderId = extractFolderId(url);
+                if (!folderId) return;
+
+                // Auto-trigger sync immediately
+                syncResultBanner.style.display = "block";
+                syncResultBanner.className = "alert alert-info";
+                syncResultBanner.textContent = "⚡ Google Drive link detected! Starting auto-sync in background...";
+                syncProgressContainer.style.display = "block";
+                startSyncBtn.disabled = true;
+                startSyncBtn.textContent = "⏳ Auto-Syncing Google Drive...";
+
+                try {
+                    const res = await fetch("/api/sync/drive", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ folder_url: url, force: true })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data && data.success) {
+                        pollSyncStatus();
+                        fetchAutoSyncStatus();
+                    }
+                } catch (err) {
+                    console.warn("Auto drive sync trigger error:", err);
+                }
+            }, 600);
+        };
+
+        driveUrl.addEventListener("change", autoSyncOnLinkEntry);
+        driveUrl.addEventListener("paste", autoSyncOnLinkEntry);
+    }
+
+    // Initialize auto-sync polling
+    fetchAutoSyncStatus();
+    autoSyncPollTimer = setInterval(fetchAutoSyncStatus, 3000);
 
     // Direct Upload Dropzone
     dropzone.addEventListener("click", () => directUploadInput.click());

@@ -199,11 +199,48 @@
                             </div>
                         </div>
 
+                        <!-- Live Continuous Auto-Sync Card -->
+                        <div class="auto-sync-card" id="autoSyncCard" style="background: rgba(125, 26, 44, 0.04); border: 1.5px solid rgba(125, 26, 44, 0.22); border-radius: 10px; padding: 14px 16px; margin: 12px 0 16px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="auto-sync-dot" id="autoSyncLiveDot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;"></span>
+                                    <strong style="color: #5a1226; font-size: 0.92rem;" id="autoSyncTitleText">⚡ Live Drive Auto-Sync</strong>
+                                    <span class="badge badge-success" id="autoSyncBadge" style="font-size: 0.72rem; padding: 2px 8px; border-radius: 12px;">Active</span>
+                                </div>
+                                <label class="switch-toggle" style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;" title="Toggle continuous auto-sync">
+                                    <input type="checkbox" id="autoSyncToggle" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span class="switch-slider round" id="autoSyncSlider" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #10b981; transition: .3s; border-radius: 24px;"></span>
+                                </label>
+                            </div>
+                            <p style="font-size: 0.8rem; color: #555; margin: 0 0 10px; line-height: 1.45;" id="autoSyncDescText">
+                                Continuously monitors Google Drive in the background. When your photographer or cameraman uploads new photos, they are automatically fetched and indexed for guest face recognition in real-time.
+                            </p>
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.78rem; border-top: 1px dashed rgba(125, 26, 44, 0.2); padding-top: 8px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="color: #444; font-weight: 500;">⏱️ Check Cadence:</span>
+                                    <select id="autoSyncIntervalSelect" style="padding: 3px 8px; border-radius: 6px; border: 1px solid #c79ca6; font-size: 0.78rem; background: #fff; color: #333; font-weight: 500; cursor: pointer;">
+                                        <option value="30">Every 30 seconds</option>
+                                        <option value="60" selected>Every 1 minute (Recommended)</option>
+                                        <option value="120">Every 2 minutes</option>
+                                        <option value="300">Every 5 minutes</option>
+                                    </select>
+                                </div>
+                                <div style="display: flex; gap: 12px; color: #444; font-weight: 500;">
+                                    <span id="autoSyncLastCheck">Last check: <strong id="autoSyncLastCheckTime">Never</strong></span>
+                                    <span id="autoSyncNextCountdown">Next check: <strong id="autoSyncNextInSec">in ~60s</strong></span>
+                                </div>
+                            </div>
+                            <div id="autoSyncActivityMsg" style="margin-top: 8px; padding: 6px 10px; border-radius: 6px; font-size: 0.76rem; color: #047857; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); display: none;"></div>
+                        </div>
+
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary btn-block" id="startSyncBtn">
-                                🔄 Sync Photos from Google Drive
+                                🔄 Sync Photos from Google Drive Now (Force Refresh)
                             </button>
                         </div>
+                        <small style="display: block; text-align: center; color: #666; font-size: 0.75rem; margin-top: 6px;">
+                            💡 Auto-Sync checks Drive automatically every minute. Click above to force an instant manual sync right now.
+                        </small>
                     </form>
 
                     <!-- Live Sync Progress Card -->

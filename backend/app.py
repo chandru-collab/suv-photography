@@ -53,7 +53,11 @@ from backend.sync_service import (
     sync_status,
     ingest_uploaded_file,
     extract_drive_folder_id,
-    VALID_EXTENSIONS
+    VALID_EXTENSIONS,
+    start_auto_sync_daemon,
+    stop_auto_sync_daemon,
+    get_auto_sync_status,
+    set_auto_sync_settings
 )
 from backend.cache import vector_cache, metadata_cache
 from backend.rate_limiter import require_search_rate_limit
@@ -72,7 +76,7 @@ if not DEFAULT_QR_PATH.exists():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Warm up in-memory vector embeddings cache on server startup."""
+    """Warm up in-memory vector embeddings cache on server startup and launch live auto-sync daemon."""
     logger.info("Production Startup: warming face embedding vector cache...")
     vector_cache.get_embeddings()
     logger.info(f"Production Startup: warmed {vector_cache.count} face embeddings in RAM.")
@@ -84,7 +88,11 @@ async def lifespan(app: FastAPI):
                 drive_manager.get_descendant_folder_ids(root_id)
         except Exception:
             pass
+    # Launch continuous background auto-sync daemon
+    start_auto_sync_daemon()
     yield
+    # Cleanly stop auto-sync worker on shutdown
+    stop_auto_sync_daemon()
 
 app = FastAPI(title="Event Photo Sharing App", version="2.0.0 (Production)", lifespan=lifespan)
 
@@ -994,6 +1002,21 @@ async def get_sync_status():
     """Poll live sync progress."""
     return sync_status
 
+@app.get("/api/sync/auto-sync", dependencies=[Depends(require_auth)])
+async def get_auto_sync():
+    """Poll live auto-sync watcher status."""
+    return get_auto_sync_status()
+
+class AutoSyncConfigRequest(BaseModel):
+    enabled: bool
+    interval_seconds: int = 60
+
+@app.post("/api/sync/auto-sync", dependencies=[Depends(require_auth)])
+async def update_auto_sync(payload: AutoSyncConfigRequest):
+    """Update continuous auto-sync settings (enabled / interval)."""
+    updated = set_auto_sync_settings(payload.enabled, payload.interval_seconds)
+    return {"success": True, "auto_sync": updated}
+
 @app.post("/api/photos/upload", dependencies=[Depends(require_auth)])
 async def upload_photos(files: List[UploadFile] = File(...)):
     """Direct upload of photos from host dashboard."""
@@ -1043,10 +1066,19 @@ class UpdateSettingsRequest(BaseModel):
     event_date: Optional[str] = None
     event_location: Optional[str] = None
     cover_photo_path: Optional[str] = None
+    drive_folder_url: Optional[str] = None
 
 @app.post("/api/settings", dependencies=[Depends(require_auth)])
 async def update_settings(payload: UpdateSettingsRequest):
     """Update event configuration."""
+    if payload.drive_folder_url is not None:
+        raw_url = payload.drive_folder_url.strip()
+        if raw_url:
+            folder_id = extract_drive_folder_id(raw_url)
+            if folder_id:
+                set_setting("drive_folder_url", f"https://drive.google.com/drive/folders/{folder_id}")
+                # Automatically fetch & sync photos in background immediately on setting save
+                start_background_drive_sync(folder_id, force=True)
     if payload.event_name is not None:
         set_setting("event_name", payload.event_name.strip())
     if payload.match_threshold is not None:

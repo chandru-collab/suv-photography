@@ -6,6 +6,7 @@ import logging
 import threading
 import time
 import concurrent.futures
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Tuple
 import requests
@@ -28,7 +29,8 @@ from backend.database import (
     insert_face,
     start_sync_log,
     finish_sync_log,
-    set_setting
+    set_setting,
+    get_setting
 )
 from backend.face_engine import face_engine
 from backend.cache import vector_cache, metadata_cache
@@ -493,3 +495,134 @@ def ingest_uploaded_file(file_bytes: bytes, filename: str) -> Tuple[bool, int, s
     finally:
         if temp_path.exists():
             temp_path.unlink()
+
+# ==========================================
+# CONTINUOUS LIVE AUTO-SYNC ENGINE
+# ==========================================
+
+auto_sync_status = {
+    "enabled": True,
+    "interval_seconds": 60,
+    "running": False,
+    "last_check_timestamp": 0.0,
+    "last_check_time_str": "Never",
+    "last_photos_added": 0,
+    "last_faces_detected": 0,
+    "last_message": "Auto-sync initializing...",
+    "next_check_in_seconds": 60,
+    "total_cycles": 0
+}
+
+_auto_sync_stop_event = threading.Event()
+_auto_sync_thread: Optional[threading.Thread] = None
+
+def get_auto_sync_status() -> Dict[str, Any]:
+    """Get current status of background auto-sync worker with live countdown."""
+    global auto_sync_status
+    now = time.time()
+    last = auto_sync_status.get("last_check_timestamp", 0.0)
+    interval = auto_sync_status.get("interval_seconds", 60)
+    if last > 0 and auto_sync_status.get("enabled", True):
+        remaining = max(0, int(interval - (now - last)))
+    else:
+        remaining = interval
+    auto_sync_status["next_check_in_seconds"] = remaining
+    return dict(auto_sync_status)
+
+def set_auto_sync_settings(enabled: bool, interval_seconds: int = 60) -> Dict[str, Any]:
+    """Update auto-sync configuration in persistent DB settings."""
+    global auto_sync_status
+    interval_seconds = max(15, min(3600, int(interval_seconds)))
+    set_setting("auto_sync_enabled", "true" if enabled else "false")
+    set_setting("auto_sync_interval_seconds", str(interval_seconds))
+    auto_sync_status["enabled"] = enabled
+    auto_sync_status["interval_seconds"] = interval_seconds
+    if enabled:
+        auto_sync_status["last_message"] = f"Auto-sync enabled (checking every {interval_seconds}s)"
+    else:
+        auto_sync_status["last_message"] = "Auto-sync paused by admin."
+    return get_auto_sync_status()
+
+def auto_sync_worker_loop():
+    """
+    Continuous background daemon thread.
+    Automatically checks the active Google Drive folder for newly uploaded photos
+    (e.g. from the photographer/cameraman) and indexes them incrementally into SQLite
+    and in-memory vector cache without manual intervention.
+    """
+    global auto_sync_status
+    logger.info("Continuous Drive Auto-Sync daemon started.")
+
+    # Brief delay on startup so the main server finishes initial cache warming
+    time.sleep(4.0)
+
+    while not _auto_sync_stop_event.is_set():
+        try:
+            enabled_str = get_setting("auto_sync_enabled", "true")
+            interval_str = get_setting("auto_sync_interval_seconds", "60")
+            try:
+                interval_secs = max(15, int(interval_str))
+            except (ValueError, TypeError):
+                interval_secs = 60
+
+            is_enabled = (enabled_str.lower() != "false")
+            auto_sync_status["enabled"] = is_enabled
+            auto_sync_status["interval_seconds"] = interval_secs
+
+            if is_enabled and drive_manager.is_configured:
+                folder_url = get_setting("drive_folder_url", "").strip()
+                folder_id = extract_drive_folder_id(folder_url) if folder_url else None
+
+                # Only run if folder is configured and no manual sync is currently in progress
+                if folder_id and not sync_status.get("running", False):
+                    auto_sync_status["running"] = True
+                    auto_sync_status["last_message"] = "Checking Google Drive for newly added photos..."
+
+                    # Run incremental sync (reindex=False skips all existing photos instantly)
+                    run_drive_sync(folder_id, reindex=False)
+
+                    now_ts = time.time()
+                    auto_sync_status["last_check_timestamp"] = now_ts
+                    auto_sync_status["last_check_time_str"] = datetime.now().strftime("%I:%M:%S %p")
+                    added = sync_status.get("photos_added", 0)
+                    faces = sync_status.get("faces_detected", 0)
+                    auto_sync_status["last_photos_added"] = added
+                    auto_sync_status["last_faces_detected"] = faces
+                    auto_sync_status["total_cycles"] += 1
+
+                    if added > 0:
+                        msg = f"Auto-synced {added} new photos ({faces} faces) from Google Drive!"
+                        auto_sync_status["last_message"] = msg
+                        logger.info(f"Auto-Sync: {msg}")
+                    else:
+                        auto_sync_status["last_message"] = f"Folder up-to-date (checked at {auto_sync_status['last_check_time_str']}). Live watcher active."
+                    auto_sync_status["running"] = False
+
+        except Exception as e:
+            logger.error(f"Error in auto_sync_worker_loop: {e}", exc_info=True)
+            auto_sync_status["running"] = False
+            auto_sync_status["last_message"] = f"Auto-sync check error: {e}"
+
+        # Sleep in 1-second ticks so stop event or interval updates respond immediately
+        curr_interval = auto_sync_status.get("interval_seconds", 60)
+        for _ in range(curr_interval):
+            if _auto_sync_stop_event.is_set():
+                break
+            time.sleep(1.0)
+
+def start_auto_sync_daemon():
+    """Start the auto-sync background worker thread if not already running."""
+    global _auto_sync_thread, _auto_sync_stop_event
+    if _auto_sync_thread is not None and _auto_sync_thread.is_alive():
+        return
+    _auto_sync_stop_event.clear()
+    _auto_sync_thread = threading.Thread(target=auto_sync_worker_loop, daemon=True, name="DriveAutoSyncWorker")
+    _auto_sync_thread.start()
+    logger.info("Drive Auto-Sync background daemon thread launched successfully.")
+
+def stop_auto_sync_daemon():
+    """Stop the auto-sync background worker cleanly."""
+    global _auto_sync_stop_event
+    _auto_sync_stop_event.set()
+    logger.info("Drive Auto-Sync background daemon stopping...")
+

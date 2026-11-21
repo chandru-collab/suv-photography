@@ -6,7 +6,7 @@ __pycache__/
 .env
 
 # Runtime data (except keep dir structure)
-data/*.db
+data/*.db*
 data/events.db
 data/google_credentials.json
 data/photos/*
