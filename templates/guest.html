@@ -1300,35 +1300,7 @@
             flex-wrap: wrap;
         }
 
-        .lightbox-swipe-pills {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
 
-        .lightbox-pill-btn {
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            color: #ffffff;
-            font-size: 0.85rem;
-            font-weight: 600;
-            padding: 9px 16px;
-            border-radius: 24px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-
-        .lightbox-pill-btn:hover,
-        .lightbox-pill-btn:active {
-            background: #722234;
-            border-color: #a0394f;
-            transform: scale(1.02);
-        }
 
         .lightbox-dl-btn {
             padding: 10px 20px !important;
@@ -1368,10 +1340,7 @@
             .lightbox-action-row {
                 justify-content: space-between;
             }
-            .lightbox-pill-btn {
-                padding: 8px 12px;
-                font-size: 0.8rem;
-            }
+
             .lightbox-dl-btn {
                 padding: 8px 14px !important;
                 font-size: 0.82rem !important;
@@ -2192,14 +2161,7 @@
                 <span id="lightboxFilename" class="lightbox-filename"></span>
             </div>
             <div class="lightbox-action-row">
-                <div class="lightbox-swipe-pills">
-                    <button type="button" class="lightbox-pill-btn" id="lightboxMobilePrevBtn" aria-label="Previous Photo">
-                        ◀ Prev
-                    </button>
-                    <button type="button" class="lightbox-pill-btn" id="lightboxMobileNextBtn" aria-label="Next Photo">
-                        Next ▶
-                    </button>
-                </div>
+
                 <a id="lightboxDownloadBtn" href="#" download class="btn suv-btn-primary lightbox-dl-btn">
                     ⬇️ Download High-Res
                 </a>
@@ -2322,8 +2284,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const lightboxCounter = document.getElementById("lightboxCounter");
     const lightboxPrevBtn = document.getElementById("lightboxPrevBtn");
     const lightboxNextBtn = document.getElementById("lightboxNextBtn");
-    const lightboxMobilePrevBtn = document.getElementById("lightboxMobilePrevBtn");
-    const lightboxMobileNextBtn = document.getElementById("lightboxMobileNextBtn");
     const lightboxImageWrap = document.getElementById("lightboxImageWrap");
 
     // Internal State
@@ -2875,8 +2835,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Attach Click Events to Nav and Swipe Buttons
     if (lightboxPrevBtn) lightboxPrevBtn.addEventListener("click", showPrevPhoto);
     if (lightboxNextBtn) lightboxNextBtn.addEventListener("click", showNextPhoto);
-    if (lightboxMobilePrevBtn) lightboxMobilePrevBtn.addEventListener("click", showPrevPhoto);
-    if (lightboxMobileNextBtn) lightboxMobileNextBtn.addEventListener("click", showNextPhoto);
+
 
     if (closeLightboxBtn) closeLightboxBtn.addEventListener("click", closeLightbox);
 
