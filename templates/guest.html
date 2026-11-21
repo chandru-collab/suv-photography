@@ -2551,36 +2551,8 @@
                 </button>
 
                 <div class="feedback-footer-note">
-                    <button type="button" class="feedback-skip-btn" id="skipFeedbackBtn">Already reviewed on Google Maps • Continue to Photos →</button>
+                    <button type="button" class="feedback-skip-btn" id="skipFeedbackBtn">Skip &amp; Continue to Photos →</button>
                 </div>
-            </div>
-
-            <!-- State 2: Instant Success & Direct Google Review Action -->
-            <div id="feedbackSuccessState" style="display: none;">
-                <div class="feedback-brand-badge">
-                    <img src="/static/img/suv_monogram_black.png?v=20261119_black_v2" alt="SUV Photography" class="feedback-logo">
-                    <span class="feedback-brand-title">SUV PHOTOGRAPHY</span>
-                </div>
-
-                <div class="feedback-success-badge">✅ Review Text Copied to Clipboard!</div>
-
-                <h3 class="feedback-title" style="margin: 8px 0;">Post on Google Maps ✨</h3>
-                <p class="feedback-subtitle" style="margin-bottom: 10px;">
-                    Google Maps has opened in a new tab. Simply <strong>paste your review</strong> and tap <strong>Post</strong> to share your 5 stars!
-                </p>
-
-                <div class="review-preview-box" id="feedbackCopiedPreview"></div>
-
-                <a id="feedbackGoogleMapsLink" href="https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu" target="_blank" rel="noopener noreferrer" class="feedback-submit-btn" style="text-decoration: none; margin-bottom: 10px;">
-                    <span class="btn-google-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                    </span>
-                    <span>⭐ Open Google Maps (If Not Opened)</span>
-                </a>
-
-                <button type="button" class="btn-unlock-photos" id="continueToPhotosSuccessBtn">
-                    Done! Continue to My Photos →
-                </button>
             </div>
         </div>
     </div>
@@ -2710,16 +2682,45 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    const feedbackFormState = document.getElementById("feedbackFormState");
-    const feedbackSuccessState = document.getElementById("feedbackSuccessState");
-    const feedbackCopiedPreview = document.getElementById("feedbackCopiedPreview");
-    const feedbackGoogleMapsLink = document.getElementById("feedbackGoogleMapsLink");
-    const continueToPhotosSuccessBtn = document.getElementById("continueToPhotosSuccessBtn");
+    function showToast(message) {
+        let toast = document.getElementById("guestToast");
+        if (!toast) {
+            toast = document.createElement("div");
+            toast.id = "guestToast";
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px);
+                background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
+                color: #ffffff;
+                padding: 14px 24px;
+                border-radius: 30px;
+                font-size: 0.88rem;
+                font-weight: 600;
+                box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+                z-index: 99999;
+                transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+                text-align: center;
+                max-width: 90vw;
+                pointer-events: none;
+                border: 1px solid rgba(212, 175, 120, 0.45);
+            `;
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = message;
+        requestAnimationFrame(() => {
+            toast.style.transform = "translateX(-50%) translateY(0)";
+            toast.style.opacity = "1";
+        });
+        setTimeout(() => {
+            toast.style.transform = "translateX(-50%) translateY(100px)";
+            toast.style.opacity = "0";
+        }, 4500);
+    }
 
     function openFeedbackModal() {
         if (feedbackModal) {
-            if (feedbackFormState) feedbackFormState.style.display = "block";
-            if (feedbackSuccessState) feedbackSuccessState.style.display = "none";
             feedbackModal.style.display = "flex";
             document.body.style.overflow = "hidden";
         }
@@ -2741,13 +2742,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (continueToPhotosSuccessBtn) {
-        continueToPhotosSuccessBtn.addEventListener("click", () => {
-            localStorage.setItem("suv_feedback_submitted", "true");
-            closeFeedbackModal();
-        });
-    }
-
     if (submitFeedbackBtn) {
         submitFeedbackBtn.addEventListener("click", () => {
             const activeChips = feedbackTagsRow ? Array.from(feedbackTagsRow.querySelectorAll(".feedback-chip.active")).map(c => c.getAttribute("data-tag")) : [];
@@ -2756,7 +2750,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const guestPhone = feedbackGuestPhone ? feedbackGuestPhone.value.trim() : "";
             const targetUrl = activeGoogleReviewUrl || "https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu";
 
-            // 1. Copy review text to clipboard for instant pasting on Google Maps
+            // 1. Copy review text to clipboard for effortless pasting on Google Maps
             if (textToSubmit) {
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(textToSubmit).catch(() => {});
@@ -2791,18 +2785,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 keepalive: true
             }).catch(e => console.warn("Background feedback save:", e));
 
-            // 4. Mark submitted in local storage
+            // 4. Mark submitted in local storage & unlock gallery immediately
             localStorage.setItem("suv_feedback_submitted", "true");
+            closeFeedbackModal();
 
-            // 5. Instantly switch to Success / Follow-up State
-            if (feedbackCopiedPreview) {
-                feedbackCopiedPreview.textContent = `"${textToSubmit || 'Outstanding 5-Star Photography Service!'}"`;
-            }
-            if (feedbackGoogleMapsLink) {
-                feedbackGoogleMapsLink.href = targetUrl;
-            }
-            if (feedbackFormState) feedbackFormState.style.display = "none";
-            if (feedbackSuccessState) feedbackSuccessState.style.display = "block";
+            // 5. Friendly toast notification
+            showToast("⭐ Thank you! Google Maps opened — Opening your event photos!");
         });
     }
     // Stepper elements
