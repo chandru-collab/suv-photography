@@ -22,5 +22,6 @@ suv-photography-*.json
 *credentials*.json
 
 # Deployment caches & local build artifacts
+cloudflared.exe
 .DS_Store
 Thumbs.db
