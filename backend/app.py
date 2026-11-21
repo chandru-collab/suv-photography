@@ -54,7 +54,6 @@ from backend.sync_service import (
     start_background_drive_sync,
     cancel_current_sync,
     sync_status,
-    ingest_uploaded_file,
     extract_drive_folder_id,
     VALID_EXTENSIONS,
     start_auto_sync_daemon,
@@ -1074,34 +1073,6 @@ async def list_feedbacks():
     summary = get_feedback_summary()
     return {"success": True, "feedbacks": feedbacks, "summary": summary}
 
-
-@app.post("/api/photos/upload", dependencies=[Depends(require_auth)])
-async def upload_photos(files: List[UploadFile] = File(...)):
-    """Direct upload of photos from host dashboard."""
-    added_count = 0
-    total_faces = 0
-    messages = []
-
-    for file in files:
-        ext = Path(file.filename).suffix.lower()
-        if ext not in VALID_EXTENSIONS:
-            messages.append(f"Skipped {file.filename}: unsupported file type.")
-            continue
-
-        contents = await file.read()
-        added, face_count, msg = ingest_uploaded_file(contents, file.filename)
-        if added:
-            added_count += 1
-            total_faces += face_count
-        messages.append(msg)
-
-    return {
-        "success": True,
-        "added": added_count,
-        "faces": total_faces,
-        "messages": messages,
-        "stats": get_stats()
-    }
 
 @app.delete("/api/photos/{photo_id}", dependencies=[Depends(require_auth)])
 async def remove_photo(photo_id: int):

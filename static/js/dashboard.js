@@ -29,10 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const autoSyncNextInSec = document.getElementById("autoSyncNextInSec");
     const autoSyncActivityMsg = document.getElementById("autoSyncActivityMsg");
 
-    const dropzone = document.getElementById("dropzone");
-    const directUploadInput = document.getElementById("directUploadInput");
-    const uploadStatus = document.getElementById("uploadStatus");
-
     const settingsForm = document.getElementById("settingsForm");
     const eventNameInput = document.getElementById("eventNameInput");
     const coupleTitleInput = document.getElementById("coupleTitleInput");
@@ -524,68 +520,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize auto-sync polling
     fetchAutoSyncStatus();
     autoSyncPollTimer = setInterval(fetchAutoSyncStatus, 3000);
-
-    // Direct Upload Dropzone
-    dropzone.addEventListener("click", () => directUploadInput.click());
-
-    ["dragenter", "dragover"].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dropzone.classList.add("dragover");
-        }, false);
-    });
-
-    ["dragleave", "drop"].forEach(eventName => {
-        dropzone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dropzone.classList.remove("dragover");
-        }, false);
-    });
-
-    dropzone.addEventListener("drop", (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFiles(files);
-    });
-
-    directUploadInput.addEventListener("change", (e) => {
-        handleFiles(e.target.files);
-    });
-
-    async function handleFiles(files) {
-        if (!files.length) return;
-
-        uploadStatus.className = "alert alert-info";
-        uploadStatus.textContent = `Uploading & processing ${files.length} photo(s)...`;
-        uploadStatus.style.display = "block";
-
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append("files", files[i]);
-        }
-
-        try {
-            const res = await fetch("/api/photos/upload", {
-                method: "POST",
-                body: formData
-            });
-            const data = await res.json();
-            if (data.success) {
-                uploadStatus.className = "alert alert-success";
-                uploadStatus.textContent = `Successfully processed: ${data.added} photo(s) added, ${data.faces} face(s) indexed.`;
-                loadStats();
-                loadPhotos();
-            } else {
-                uploadStatus.className = "alert alert-error";
-                uploadStatus.textContent = "Upload failed: " + (data.error || "Unknown error");
-            }
-        } catch (err) {
-            uploadStatus.className = "alert alert-error";
-            uploadStatus.textContent = "Network error uploading photos: " + err.message;
-        }
-    }
 
     // Settings & Slider
     thresholdSlider.addEventListener("input", (e) => {

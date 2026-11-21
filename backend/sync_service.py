@@ -471,31 +471,6 @@ def start_background_drive_sync(folder_link_or_id: str, force: bool = True, rein
     t = threading.Thread(target=run_drive_sync, args=(folder_link_or_id, reindex), daemon=True)
     t.start()
 
-def ingest_uploaded_file(file_bytes: bytes, filename: str) -> Tuple[bool, int, str]:
-    """Ingest a directly uploaded file from host dashboard."""
-    temp_dir = DATA_DIR / "temp_uploads"
-    temp_dir.mkdir(parents=True, exist_ok=True)
-    safe_basename = Path(filename).name
-    safe_clean = re.sub(r"[^\w\-.]", "_", safe_basename)
-    if not safe_clean:
-        safe_clean = "uploaded_photo.jpg"
-    temp_path = temp_dir / safe_clean
-    with open(temp_path, "wb") as f:
-        f.write(file_bytes)
-
-    try:
-        added, face_count = process_single_image_file(temp_path, source_label="upload")
-        if added:
-            vector_cache.invalidate()
-            metadata_cache.invalidate()
-            msg = f"Photo '{filename}' indexed with {face_count} face(s)."
-        else:
-            msg = f"Photo '{filename}' skipped (already indexed or unreadable)."
-        return added, face_count, msg
-    finally:
-        if temp_path.exists():
-            temp_path.unlink()
-
 # ==========================================
 # CONTINUOUS LIVE AUTO-SYNC ENGINE
 # ==========================================
