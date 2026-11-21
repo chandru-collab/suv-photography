@@ -345,16 +345,6 @@
                                 </div>
                             </div>
 
-                            <!-- Google Maps Review Link -->
-                            <div class="form-group">
-                                <label for="googleReviewUrlInput">Google Review Link / Maps Place URL</label>
-                                <div class="input-icon-wrap">
-                                    <span class="field-icon">⭐</span>
-                                    <input type="text" id="googleReviewUrlInput" value="{{ settings.google_review_url or 'https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu' }}" placeholder="https://www.google.com/maps/place/SUV+PHOTOGRAPHY/...">
-                                </div>
-                                <small class="form-hint">Guests who submit the pop-up feedback form are automatically directed here to post their Google review.</small>
-                            </div>
-
                             <div style="margin-top: 6px;">
                                 <button type="submit" class="btn btn-primary btn-block" id="saveSettingsBtn">💾 Save Event &amp; Cover Details</button>
                             </div>
@@ -415,32 +405,6 @@
                     </div>
 
                     <div id="uploadStatus" class="alert alert-info" style="display: none; margin-top: 12px;"></div>
-                </div>
-            </div>
-
-            <!-- Card 5: Guest Reviews & Google Maps Feedback -->
-            <div class="card card-reviews" style="grid-column: 1 / -1;">
-                <div class="card-header">
-                    <div>
-                        <h2>5. Guest Reviews &amp; Google Feedback</h2>
-                        <span class="card-sublabel">Reviews collected from guests right after the event cover screen</span>
-                    </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span class="badge badge-success" id="avgRatingBadge">⭐ 5.0 / 5.0</span>
-                        <a href="{{ settings.google_review_url or 'https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu' }}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 0.78rem;">
-                            📍 Open on Google Maps ↗
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div id="reviewsListLoading" style="text-align: center; padding: 20px; color: #888;">
-                        Loading guest reviews...
-                    </div>
-                    <div id="reviewsEmpty" style="display: none; text-align: center; padding: 30px 20px; color: #777;">
-                        <p style="font-size: 1.05rem; margin-bottom: 6px;">💌 No guest reviews submitted yet.</p>
-                        <small>When guests enter from the cover screen, they are prompted to submit their feedback &amp; Google Review.</small>
-                    </div>
-                    <div id="reviewsList" class="reviews-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px;"></div>
                 </div>
             </div>
         </div>
