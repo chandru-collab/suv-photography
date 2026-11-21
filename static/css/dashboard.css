@@ -282,10 +282,10 @@ body.dashboard-body, body {
    Dashboard Container
    ========================================================================== */
 .dashboard-container {
-    max-width: 1480px;
-    width: 96%;
+    max-width: 1360px;
+    width: 95%;
     margin: 22px auto 60px;
-    padding: 0 4px;
+    padding: 0 8px;
 }
 
 /* ==========================================================================
@@ -643,12 +643,16 @@ body.dashboard-body, body {
 }
 
 /* ==========================================================================
-   Card 3: Event Details & Live Phone Mockup
+   Card 3: Event Details & Live Phone Mockup (Full-Width Responsive Section)
    ========================================================================== */
+.card.card-settings {
+    grid-column: 1 / -1;
+}
+
 .cover-editor-layout {
     display: grid;
-    grid-template-columns: 1fr 190px;
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 32px;
     align-items: start;
 }
 
@@ -1145,27 +1149,22 @@ input[type="range"] {
 /* ==========================================================================
    Responsive Media Queries for All Devices (Laptop, Tablet, Mobile)
    ========================================================================== */
-@media (max-width: 1200px) {
-    .cover-editor-layout {
-        grid-template-columns: 1fr;
-    }
-    .cover-mockup-col {
-        margin-top: 14px;
-    }
-    .mini-phone-frame {
-        width: 170px;
-        height: 350px;
-    }
-}
-
 @media (max-width: 1024px) {
+    .dashboard-container {
+        width: 96%;
+        padding: 0 4px;
+        margin: 16px auto 40px;
+    }
     .stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        gap: 12px;
     }
     .main-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+    .card.card-settings {
+        grid-column: 1;
     }
     .hero-container {
         flex-direction: column;
@@ -1181,6 +1180,23 @@ input[type="range"] {
     }
 }
 
+@media (max-width: 860px) {
+    .cover-editor-layout {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    .cover-mockup-col {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .mini-phone-frame {
+        width: 190px;
+        height: 390px;
+    }
+}
+
 @media (max-width: 768px) {
     .top-nav {
         padding: 10px 14px;
@@ -1189,27 +1205,40 @@ input[type="range"] {
     .nav-container {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
+        gap: 10px;
+    }
+    .nav-brand {
+        justify-content: flex-start;
     }
     .nav-status-indicator {
         justify-content: center;
+        width: 100%;
+        padding: 5px 10px;
     }
     .nav-actions {
         width: 100%;
+        display: flex;
+        gap: 6px;
     }
     .nav-action-btn {
         flex: 1;
         justify-content: center;
-        font-size: 0.78rem;
-        padding: 8px 6px;
+        font-size: 0.76rem;
+        padding: 8px 4px;
+        text-align: center;
     }
     .card-body.qr-section {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
+        text-align: center;
     }
     .qr-preview-box {
-        max-width: 200px;
+        width: 100%;
+        max-width: 220px;
         margin: 0 auto;
+    }
+    .qr-details {
+        width: 100%;
     }
     .date-loc-row {
         grid-template-columns: 1fr;
@@ -1222,36 +1251,59 @@ input[type="range"] {
     }
     .cover-manager-btn-row {
         width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
     }
     .cover-btn {
         flex: 1 1 auto;
         text-align: center;
         justify-content: center;
     }
-    .ingest-features-grid {
-        grid-template-columns: 1fr;
-    }
     .sync-metrics {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 520px) {
+    .dashboard-container {
+        width: 100%;
+        padding: 0 10px;
+        margin: 12px auto 30px;
+    }
     .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
     .stat-card {
-        padding: 14px 16px;
+        padding: 12px 14px;
     }
     .stat-value {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
+    }
+    .stat-label {
+        font-size: 0.74rem;
+    }
+    .stat-hint {
+        display: none;
     }
     .card-header {
         padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
     .card-body {
         padding: 16px 14px;
+    }
+    .hero-title {
+        font-size: 1.25rem;
+    }
+    .hero-desc {
+        font-size: 0.8rem;
+    }
+    .hero-quick-shortcuts {
+        flex-direction: column;
     }
     .form-group input[type="text"],
     .form-group input[type="password"],
