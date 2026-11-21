@@ -789,6 +789,10 @@ document.addEventListener("DOMContentLoaded", () => {
             event_location: eventLocation,
             match_threshold: thresh
         };
+        const googleReviewUrlInput = document.getElementById("googleReviewUrlInput");
+        if (googleReviewUrlInput && googleReviewUrlInput.value.trim()) {
+            payload.google_review_url = googleReviewUrlInput.value.trim();
+        }
         if (eventNameInput && eventNameInput.value.trim()) {
             payload.event_name = eventNameInput.value.trim();
         }
@@ -958,6 +962,55 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Guest Feedback & Google Reviews Loader
+    async function loadFeedbacks() {
+        const reviewsList = document.getElementById("reviewsList");
+        const reviewsLoading = document.getElementById("reviewsListLoading");
+        const reviewsEmpty = document.getElementById("reviewsEmpty");
+        const avgRatingBadge = document.getElementById("avgRatingBadge");
+        if (!reviewsList) return;
+
+        try {
+            const res = await fetch("/api/feedbacks");
+            if (!res.ok) return;
+            const data = await res.json();
+            if (reviewsLoading) reviewsLoading.style.display = "none";
+
+            if (avgRatingBadge && data.summary) {
+                avgRatingBadge.textContent = `⭐ ${data.summary.average_rating} / 5.0 (${data.summary.total_feedbacks} reviews)`;
+            }
+
+            if (!data.feedbacks || data.feedbacks.length === 0) {
+                if (reviewsEmpty) reviewsEmpty.style.display = "block";
+                reviewsList.innerHTML = "";
+                return;
+            }
+
+            if (reviewsEmpty) reviewsEmpty.style.display = "none";
+            reviewsList.innerHTML = data.feedbacks.map(f => {
+                const stars = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+                const tags = f.tags ? f.tags.split(",").filter(Boolean).map(t => `<span class="tag-pill" style="font-size: 0.72rem; padding: 2px 8px;">${t.trim()}</span>`).join(" ") : "";
+                const time = f.created_at ? f.created_at.split(".")[0] : "";
+                return `
+                    <div style="background: #fff; border: 1px solid #eadcd4; border-radius: 12px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <strong style="color: #4a1521; font-size: 0.88rem;">${f.guest_name || 'Guest'}</strong>
+                            <span style="color: #f59e0b; font-size: 0.95rem; font-weight: bold;">${stars}</span>
+                        </div>
+                        <p style="font-size: 0.82rem; color: #444; margin: 6px 0; line-height: 1.45;">"${f.review_text || 'No text written.'}"</p>
+                        ${tags ? `<div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px;">${tags}</div>` : ''}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 0.72rem; color: #888;">
+                            <span>${f.guest_phone ? '📞 ' + f.guest_phone : ''}</span>
+                            <span>${time}</span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        } catch (err) {
+            console.warn("Failed to load feedbacks:", err);
+        }
+    }
+
     if (refreshPhotosBtn) {
         refreshPhotosBtn.addEventListener("click", loadPhotos);
     }
@@ -965,6 +1018,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initial load (dynamic hydration)
     loadStats();
     loadQrData();
+    loadFeedbacks();
     if (photosList) {
         loadPhotos();
     }

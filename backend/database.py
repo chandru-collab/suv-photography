@@ -84,6 +84,20 @@ def init_db():
     );
     """)
 
+    # Guest Google Reviews & Feedback table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS feedbacks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        guest_name TEXT,
+        guest_phone TEXT,
+        rating INTEGER DEFAULT 5,
+        review_text TEXT,
+        tags TEXT,
+        google_redirected INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     # Default settings
     defaults = {
         "event_name": "Our Event Photos",
@@ -93,7 +107,8 @@ def init_db():
         "couple_title": "Bride & Groom",
         "event_date": "17 NOV 2026",
         "event_location": "CHENNAI",
-        "cover_photo_path": "/static/img/default_wedding_cover_clean.jpg"
+        "cover_photo_path": "/static/img/default_wedding_cover_clean.jpg",
+        "google_review_url": "https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu"
     }
     for k, v in defaults.items():
         cursor.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", (k, v))
@@ -387,3 +402,35 @@ def finish_sync_log(log_id: int, status: str, message: str, found: int, added: i
     """, (status, message, found, added, skipped, faces, log_id))
     conn.commit()
     conn.close()
+
+def save_feedback(guest_name: str = "", guest_phone: str = "", rating: int = 5, review_text: str = "", tags: str = "", google_redirected: int = 1) -> int:
+    """Save guest feedback / review before redirecting to Google Maps."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO feedbacks (guest_name, guest_phone, rating, review_text, tags, google_redirected)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (guest_name.strip(), guest_phone.strip(), rating, review_text.strip(), tags.strip(), google_redirected))
+    feedback_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return feedback_id
+
+def get_feedbacks(limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+    """Retrieve guest feedbacks for admin review."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM feedbacks ORDER BY created_at DESC LIMIT ? OFFSET ?", (limit, offset))
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+def get_feedback_summary() -> Dict[str, Any]:
+    """Retrieve total count and average rating."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    row = cursor.execute("SELECT COUNT(*) as total_count, COALESCE(AVG(rating), 5.0) as avg_rating FROM feedbacks").fetchone()
+    conn.close()
+    total = row["total_count"] if row else 0
+    avg = round(row["avg_rating"], 1) if row and row["avg_rating"] is not None else 5.0
+    return {"total_feedbacks": total, "average_rating": avg}

@@ -43,7 +43,10 @@ from backend.database import (
     get_stats,
     delete_photo,
     clear_photos_not_in_folders,
-    clear_all_drive_photos
+    clear_all_drive_photos,
+    save_feedback,
+    get_feedbacks,
+    get_feedback_summary
 )
 from backend.face_engine import face_engine
 from backend.qr_service import get_guest_url, generate_qr_code, get_qr_base64, DEFAULT_QR_PATH
@@ -171,6 +174,7 @@ async def guest_page(request: Request):
             "event_date": settings.get("event_date", "17 NOV 2026"),
             "event_location": settings.get("event_location", "CHENNAI"),
             "cover_photo_path": settings.get("cover_photo_path", "/static/img/default_wedding_cover_clean.jpg"),
+            "google_review_url": settings.get("google_review_url", "https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu"),
             "settings": settings
         }
     )
@@ -1017,6 +1021,48 @@ async def update_auto_sync(payload: AutoSyncConfigRequest):
     updated = set_auto_sync_settings(payload.enabled, payload.interval_seconds)
     return {"success": True, "auto_sync": updated}
 
+# ==========================================
+# GUEST REVIEWS & FEEDBACK (GOOGLE MAPS FUNNEL)
+# ==========================================
+
+class GuestFeedbackRequest(BaseModel):
+    guest_name: Optional[str] = ""
+    guest_phone: Optional[str] = ""
+    rating: int = 5
+    review_text: Optional[str] = ""
+    tags: Optional[List[str]] = []
+
+@app.post("/api/feedback")
+async def submit_guest_feedback(payload: GuestFeedbackRequest):
+    """Submit guest feedback and retrieve Google Maps Review URL."""
+    tags_str = ", ".join(payload.tags) if payload.tags else ""
+    feedback_id = save_feedback(
+        guest_name=payload.guest_name or "Guest",
+        guest_phone=payload.guest_phone or "",
+        rating=max(1, min(5, payload.rating)),
+        review_text=payload.review_text or "",
+        tags=tags_str,
+        google_redirected=1
+    )
+    google_url = get_setting(
+        "google_review_url",
+        "https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0912913,79.654962,17z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu"
+    )
+    return {
+        "success": True,
+        "feedback_id": feedback_id,
+        "google_review_url": google_url,
+        "message": "Thank you for reviewing SUV Photography!"
+    }
+
+@app.get("/api/feedbacks", dependencies=[Depends(require_auth)])
+async def list_feedbacks():
+    """List all guest feedbacks and summary statistics for admin review."""
+    feedbacks = get_feedbacks(limit=100)
+    summary = get_feedback_summary()
+    return {"success": True, "feedbacks": feedbacks, "summary": summary}
+
+
 @app.post("/api/photos/upload", dependencies=[Depends(require_auth)])
 async def upload_photos(files: List[UploadFile] = File(...)):
     """Direct upload of photos from host dashboard."""
@@ -1067,10 +1113,13 @@ class UpdateSettingsRequest(BaseModel):
     event_location: Optional[str] = None
     cover_photo_path: Optional[str] = None
     drive_folder_url: Optional[str] = None
+    google_review_url: Optional[str] = None
 
 @app.post("/api/settings", dependencies=[Depends(require_auth)])
 async def update_settings(payload: UpdateSettingsRequest):
     """Update event configuration."""
+    if payload.google_review_url is not None:
+        set_setting("google_review_url", payload.google_review_url.strip())
     if payload.drive_folder_url is not None:
         raw_url = payload.drive_folder_url.strip()
         if raw_url:

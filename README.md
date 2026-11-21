@@ -278,7 +278,7 @@ The application includes an enterprise-grade high-throughput architecture engine
 ## ⚙️ Environment Variables (Optional)
 
 You can customize runtime behavior by setting the following environment variables:
-- `HOST_PASSWORD`: Password for dashboard access (default: `admin123`).
+- `HOST_PASSWORD`: Password for dashboard access (default: `photo123`).
 - `MATCH_THRESHOLD`: Default face matching cosine similarity threshold (default: `0.363`).
 - `SERVER_HOST`: Host bind address (default: `0.0.0.0`).
 - `SERVER_PORT`: Port to listen on (default: `8000`).
