@@ -1347,14 +1347,14 @@
             }
         }
 
-        /* Luxury Google Review & Feedback Modal */
-        .feedback-overlay {
+        /* Luxury Social Engagement & Review Gate */
+        .social-gate-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(18, 5, 8, 0.78);
+            background: rgba(18, 5, 8, 0.82);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             z-index: 10050;
@@ -1366,26 +1366,26 @@
             box-sizing: border-box;
         }
 
-        .feedback-card {
+        .social-gate-card {
             position: relative;
             background: #ffffff;
             border-radius: 26px;
-            max-width: 480px;
+            max-width: 460px;
             width: 100%;
-            padding: 28px 24px 22px;
-            box-shadow: 0 25px 50px -12px rgba(114, 34, 52, 0.4);
-            border: 1.5px solid rgba(212, 175, 120, 0.45);
+            padding: 28px 22px 22px;
+            box-shadow: 0 25px 50px -12px rgba(114, 34, 52, 0.45);
+            border: 1.5px solid rgba(212, 175, 120, 0.5);
             text-align: center;
-            animation: feedbackAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: socialAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             box-sizing: border-box;
         }
 
-        @keyframes feedbackAppear {
+        @keyframes socialAppear {
             0% { opacity: 0; transform: scale(0.92) translateY(20px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        .feedback-close-btn {
+        .social-gate-close {
             position: absolute;
             top: 14px;
             right: 16px;
@@ -1404,12 +1404,12 @@
             transition: all 0.2s;
         }
 
-        .feedback-close-btn:hover {
+        .social-gate-close:hover {
             background: #722234;
             color: #fff;
         }
 
-        .feedback-brand-badge {
+        .social-gate-brand {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1417,13 +1417,13 @@
             margin-bottom: 12px;
         }
 
-        .feedback-logo {
-            width: 46px;
+        .social-gate-logo {
+            width: 48px;
             height: auto;
             margin-bottom: 4px;
         }
 
-        .feedback-brand-title {
+        .social-gate-brand-title {
             font-family: 'Cinzel', serif;
             font-size: 0.95rem;
             font-weight: 800;
@@ -1431,148 +1431,133 @@
             letter-spacing: 2.5px;
         }
 
-        .feedback-brand-sub {
+        .social-gate-brand-sub {
             font-size: 0.72rem;
             color: #888;
             font-weight: 500;
         }
 
-        .feedback-title {
+        .social-gate-title {
             font-family: 'Cinzel', serif;
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: #3b0914;
             margin: 6px 0 6px;
             line-height: 1.3;
         }
 
-        .feedback-subtitle {
-            font-size: 0.82rem;
-            color: #666;
-            margin: 0 0 16px;
-            line-height: 1.45;
-        }
-
-        .feedback-stars-wrap {
-            background: rgba(254, 249, 239, 0.9);
-            border: 1px solid rgba(212, 175, 120, 0.45);
-            border-radius: 16px;
-            padding: 12px 14px 10px;
-            margin-bottom: 14px;
-        }
-
-        .feedback-stars {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-
-        .star-btn {
-            background: none;
-            border: none;
-            font-size: 2.2rem;
-            color: #d1d5db;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            line-height: 1;
-            padding: 2px 4px;
-        }
-
-        .star-btn.active, .star-btn:hover {
-            color: #f59e0b;
-            transform: scale(1.15);
-            text-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
-        }
-
-        .feedback-rating-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #b45309;
-        }
-
-        .feedback-tags-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 14px;
-        }
-
-        .feedback-chip {
-            background: #fdfaf7;
-            border: 1px solid #e7d8ce;
-            color: #663340;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.76rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .feedback-chip:hover, .feedback-chip.active {
-            background: #722234;
-            border-color: #722234;
-            color: #ffffff;
-            transform: translateY(-1px);
-        }
-
-        .feedback-textarea {
-            width: 100%;
-            border: 1.5px solid #e2d3c9;
-            border-radius: 12px;
-            padding: 10px 14px;
+        .social-gate-subtitle {
             font-size: 0.84rem;
-            font-family: inherit;
-            color: #333;
-            resize: vertical;
-            min-height: 75px;
-            outline: none;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-            transition: border 0.2s;
+            color: #555;
+            margin: 0 0 18px;
+            line-height: 1.5;
         }
 
-        .feedback-textarea:focus {
-            border-color: #722234;
-            box-shadow: 0 0 0 3px rgba(114, 34, 52, 0.1);
-        }
-
-        .feedback-row-inputs {
+        .social-actions-list {
             display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 18px;
         }
 
-        .feedback-field {
+        .social-action-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #fdfaf7;
+            border: 1.5px solid #ebdcd1;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.22s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            text-align: left;
+        }
+
+        .social-action-card:hover {
+            transform: translateY(-2px);
+            border-color: #722234;
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(114, 34, 52, 0.15);
+        }
+
+        .social-action-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .google-icon-wrap {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .instagram-icon-wrap {
+            background: #ffffff;
+            border: 1px solid #fed7aa;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .social-action-info {
             flex: 1;
-            border: 1.5px solid #e2d3c9;
-            border-radius: 10px;
-            padding: 9px 12px;
-            font-size: 0.82rem;
-            font-family: inherit;
-            color: #333;
-            outline: none;
-            box-sizing: border-box;
-            transition: border 0.2s;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .feedback-field:focus {
+        .social-action-name {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .social-action-desc {
+            font-size: 0.74rem;
+            color: #777;
+        }
+
+        .social-action-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: #f3eae4;
+            color: #722234;
+            flex-shrink: 0;
+            transition: all 0.2s;
+            border: 1px solid #e0cebe;
+        }
+
+        .social-action-card:hover .social-action-pill {
+            background: #722234;
+            color: #ffffff;
             border-color: #722234;
         }
 
-        .feedback-submit-btn {
+        .social-action-pill.done {
+            background: #ecfdf5 !important;
+            color: #059669 !important;
+            border-color: #a7f3d0 !important;
+        }
+
+        .social-unlock-btn {
             width: 100%;
             background: linear-gradient(135deg, #722234 0%, #4a1521 100%);
             color: #ffffff;
             border: none;
             border-radius: 28px;
-            padding: 13px 20px;
-            font-size: 0.92rem;
+            padding: 14px 20px;
+            font-size: 0.95rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(114, 34, 52, 0.35);
+            box-shadow: 0 8px 22px rgba(114, 34, 52, 0.38);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1580,89 +1565,45 @@
             transition: all 0.2s;
         }
 
-        .feedback-submit-btn:hover {
+        .social-unlock-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 12px 25px rgba(114, 34, 52, 0.45);
+            box-shadow: 0 12px 28px rgba(114, 34, 52, 0.48);
             background: linear-gradient(135deg, #87283e 0%, #5a1928 100%);
         }
 
-        .feedback-footer-note {
-            margin-top: 10px;
+        .social-skip-wrap {
+            margin-top: 12px;
         }
 
-        .feedback-skip-btn {
+        .social-skip-btn {
             background: none;
             border: none;
             color: #888;
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             cursor: pointer;
             text-decoration: underline;
             padding: 4px;
         }
 
-        .feedback-skip-btn:hover {
+        .social-skip-btn:hover {
             color: #555;
         }
 
-        .feedback-success-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .review-preview-box {
-            background: #fffbf2;
-            border: 1.5px dashed #f59e0b;
-            border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 0.82rem;
-            color: #78350f;
-            text-align: left;
-            margin: 10px 0;
-            line-height: 1.4;
-            max-height: 110px;
-            overflow-y: auto;
-            word-break: break-word;
-        }
-
-        .btn-unlock-photos {
-            width: 100%;
-            background: #fdfaf7;
-            color: #722234;
-            border: 1.5px solid #722234;
-            border-radius: 28px;
-            padding: 11px 18px;
-            font-size: 0.88rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-
-        .btn-unlock-photos:hover {
-            background: #722234;
-            color: #ffffff;
-        }
-
         @media (max-width: 480px) {
-            .feedback-card {
-                padding: 22px 18px 18px;
+            .social-gate-card {
+                padding: 22px 16px 18px;
                 border-radius: 20px;
             }
-            .feedback-row-inputs {
-                flex-direction: column;
-                gap: 8px;
+            .social-action-card {
+                padding: 12px 14px;
+                gap: 10px;
             }
-            .star-btn {
-                font-size: 1.9rem;
+            .social-action-name {
+                font-size: 0.88rem;
+            }
+            .social-action-pill {
+                padding: 5px 10px;
+                font-size: 0.74rem;
             }
         }
 
@@ -2487,6 +2428,59 @@
             </div>
         </div>
     </div>
+
+    <!-- LUXURY SOCIAL ENGAGEMENT & REVIEW GATE MODAL -->
+    <div class="social-gate-overlay" id="socialGateModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="socialGateTitle">
+        <div class="social-gate-card">
+            <button type="button" class="social-gate-close" id="closeSocialGateBtn" aria-label="Close">&times;</button>
+
+            <div class="social-gate-brand">
+                <img src="/static/img/suv_monogram_black.png?v=20261119_black_v2" alt="SUV Photography" class="social-gate-logo">
+                <span class="social-gate-brand-title">SUV PHOTOGRAPHY</span>
+                <span class="social-gate-brand-sub">Arakkonam • Wedding &amp; Celebration Photography</span>
+            </div>
+
+            <h2 class="social-gate-title" id="socialGateTitle">Support SUV Photography ✨</h2>
+            <p class="social-gate-subtitle">
+                Please leave a <strong>5-star Google review</strong> and <strong>follow our Instagram</strong> to unlock your personal photo gallery!
+            </p>
+
+            <div class="social-actions-list">
+                <!-- Action 1: Google Review -->
+                <a href="https://www.google.com/maps/place/SUV+PHOTOGRAPHY/@13.0916548,79.6546151,17.24z/data=!4m8!3m7!1s0x3a52bd005af3c077:0x9e9462013e004bd1!8m2!3d13.0912913!4d79.654962!9m1!1b1!16s%2Fg%2F11yvfmht42?entry=ttu&g_ep=EgoyMDI2MTExOC4xIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" class="social-action-card" id="googleReviewActionBtn">
+                    <div class="social-action-icon google-icon-wrap">
+                        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                    </div>
+                    <div class="social-action-info">
+                        <span class="social-action-name">⭐ Rate 5 Stars on Google</span>
+                        <span class="social-action-desc">SUV PHOTOGRAPHY • Arakkonam</span>
+                    </div>
+                    <span class="social-action-pill" id="googlePill">Review ↗</span>
+                </a>
+
+                <!-- Action 2: Instagram Follow -->
+                <a href="https://www.instagram.com/suv__photography?avpt=bW5oczZwdXVrYnlq" target="_blank" rel="noopener noreferrer" class="social-action-card" id="instagramActionBtn">
+                    <div class="social-action-icon instagram-icon-wrap">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig-grad)"/><circle cx="12" cy="12" r="4.2" stroke="#fff" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff"/><defs><linearGradient id="ig-grad" x1="2" y1="22" x2="22" y2="2" gradientUnits="userSpaceOnUse"><stop stop-color="#FD5949"/><stop offset="0.5" stop-color="#D6249F"/><stop offset="1" stop-color="#285AEB"/></linearGradient></defs></svg>
+                    </div>
+                    <div class="social-action-info">
+                        <span class="social-action-name">📸 Follow on Instagram</span>
+                        <span class="social-action-desc">@suv__photography</span>
+                    </div>
+                    <span class="social-action-pill" id="instaPill">Follow ↗</span>
+                </a>
+            </div>
+
+            <!-- Unlock Photos Button -->
+            <button type="button" class="social-unlock-btn" id="unlockPhotosBtn">
+                <span>Unlock &amp; Open Guest Profile →</span>
+            </button>
+
+            <div class="social-skip-wrap">
+                <button type="button" class="social-skip-btn" id="skipSocialGateBtn">Already reviewed &amp; following • Open Profile</button>
+            </div>
+        </div>
+    </div>
     </div> <!-- /#guestAppContainer -->
 
     <script>
@@ -2525,6 +2519,11 @@ document.addEventListener("DOMContentLoaded", () => {
         enterGalleryBtn.addEventListener("click", () => {
             weddingCoverScreen.classList.add("cover-dismissed");
             window.scrollTo({ top: 0, behavior: "smooth" });
+
+            // Pop up the Google Review & Instagram Follow gate modal
+            if (!localStorage.getItem("suv_social_unlocked")) {
+                setTimeout(openSocialGateModal, 350);
+            }
         });
     }
 
@@ -2532,6 +2531,84 @@ document.addEventListener("DOMContentLoaded", () => {
         openCoverBtn.addEventListener("click", () => {
             weddingCoverScreen.classList.remove("cover-dismissed");
             window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    // Social Gate Controller (Google Review & Instagram Follow)
+    const socialGateModal = document.getElementById("socialGateModal");
+    const closeSocialGateBtn = document.getElementById("closeSocialGateBtn");
+    const googleReviewActionBtn = document.getElementById("googleReviewActionBtn");
+    const instagramActionBtn = document.getElementById("instagramActionBtn");
+    const googlePill = document.getElementById("googlePill");
+    const instaPill = document.getElementById("instaPill");
+    const unlockPhotosBtn = document.getElementById("unlockPhotosBtn");
+    const skipSocialGateBtn = document.getElementById("skipSocialGateBtn");
+
+    function openSocialGateModal() {
+        if (socialGateModal) {
+            socialGateModal.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        }
+    }
+
+    function closeSocialGateModal() {
+        if (socialGateModal) {
+            socialGateModal.style.display = "none";
+            document.body.style.overflow = "";
+        }
+    }
+
+    if (closeSocialGateBtn) closeSocialGateBtn.addEventListener("click", closeSocialGateModal);
+
+    let hasReviewedGoogle = false;
+    let hasFollowedInsta = false;
+
+    if (googleReviewActionBtn) {
+        googleReviewActionBtn.addEventListener("click", () => {
+            hasReviewedGoogle = true;
+            if (googlePill) {
+                googlePill.textContent = "✅ Reviewed";
+                googlePill.classList.add("done");
+            }
+            checkUnlockReady();
+        });
+    }
+
+    if (instagramActionBtn) {
+        instagramActionBtn.addEventListener("click", () => {
+            hasFollowedInsta = true;
+            if (instaPill) {
+                instaPill.textContent = "✅ Followed";
+                instaPill.classList.add("done");
+            }
+            checkUnlockReady();
+        });
+    }
+
+    function checkUnlockReady() {
+        if (hasReviewedGoogle || hasFollowedInsta) {
+            if (unlockPhotosBtn) {
+                unlockPhotosBtn.innerHTML = `<span>✨ Open Guest Profile &amp; Find Photos →</span>`;
+                unlockPhotosBtn.style.background = "linear-gradient(135deg, #10b981 0%, #047857 100%)";
+            }
+        }
+    }
+
+    if (unlockPhotosBtn) {
+        unlockPhotosBtn.addEventListener("click", () => {
+            localStorage.setItem("suv_social_unlocked", "true");
+            closeSocialGateModal();
+            const mainEl = document.querySelector(".guest-main");
+            if (mainEl) mainEl.scrollIntoView({ behavior: "smooth" });
+        });
+    }
+
+    if (skipSocialGateBtn) {
+        skipSocialGateBtn.addEventListener("click", () => {
+            localStorage.setItem("suv_social_unlocked", "true");
+            closeSocialGateModal();
+            const mainEl = document.querySelector(".guest-main");
+            if (mainEl) mainEl.scrollIntoView({ behavior: "smooth" });
         });
     }
 
