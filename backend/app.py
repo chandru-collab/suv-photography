@@ -179,6 +179,18 @@ async def guest_page(request: Request):
         }
     )
 
+@app.get("/api/event")
+async def get_public_event():
+    """Public event details for live client hydration."""
+    settings = get_all_settings()
+    return {
+        "event_name": settings.get("event_name", "Event Photos"),
+        "couple_title": settings.get("couple_title", "Bride & Groom"),
+        "event_date": settings.get("event_date", "17 NOV 2026"),
+        "event_location": settings.get("event_location", "CHENNAI"),
+        "cover_photo_path": settings.get("cover_photo_path", "/static/img/default_wedding_cover_clean.jpg"),
+    }
+
 @app.get("/gallery", response_class=HTMLResponse)
 @app.get("/gallery/{folder_id:path}", response_class=HTMLResponse)
 async def gallery_page(request: Request, folder_id: Optional[str] = None):
